@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.welink.commons.persistence.MikuMineScProblemItemDOMapper" >
+  <resultMap id="oneModelResult" type="com.welink.commons.domain.MikuMineScProblemItemDO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="sc_problem_name" property="scProblemName" jdbcType="VARCHAR" />
+    <result column="sc_problem_short_name" property="scProblemShortName" jdbcType="VARCHAR" />
+    <result column="sc_problem_note" property="scProblemNote" jdbcType="VARCHAR" />
+    <result column="sc_problem_value" property="scProblemValue" jdbcType="VARCHAR" />
+    <result column="version" property="version" jdbcType="BIGINT" />
+    <result column="date_created" property="dateCreated" jdbcType="TIMESTAMP" />
+    <result column="last_updated" property="lastUpdated" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <select id="selectscOptionsByIDs" resultMap="oneModelResult" parameterType="java.util.Map">
+      SELECT 
+    	 id, sc_problem_name, sc_problem_short_name, sc_problem_note, sc_problem_value, version, 
+    	 date_created, last_updated
+       FROM miku_mine_sc_problem_item
+       where id in (${ids})
+  </select>
+</mapper>

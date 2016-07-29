@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>$!{showTitle}</title>
+    #parse("head.vm")
+    <link rel="stylesheet" href="http://$!{host}/h5/css/page/editAddress.css?v=$!{ver}"/>
+    <script src="http://webapi.amap.com/maps?v=1.3&key=68a0bff0e024c317ac1ecda5ba7deb23"></script>
+</head>
+<body>
+<section class="page slide" id="editAddressPage">
+    <div class="page-content fade">
+        <div class="page-scroll-panel form-items edit-address-form" data-role-scrollable="true">
+            <div class="grid layout">
+                <div class="row">
+                    <label class="col col-7">
+                        姓名
+                    </label>
+                    <input class="col col-16 name" type="text" placeholder="请输入姓名"/>
+
+                    <div class="col col-2"></div>
+                </div>
+                <div class="row">
+                    <label class="col col-7">手机</label>
+                    <input class="col col-16 mobile" type="tel" placeholder="请输入手机号码" maxlength="11"/>
+
+                    <div class="col col-2"></div>
+                </div>
+                <div class="row community-row fvc">
+                    <label class="col col-7">区域</label>
+
+                    <div class="col col-16 community" placeholder="请定位区域"></div>
+                    <div class="col col-2 iconfont right-icon"></div>
+                </div>
+                <div class="row">
+                    <label class="col col-7">详细地址</label>
+                    <input class="col col-16 addr" type="text" placeholder="请填写详细地址"/>
+
+                    <div class="col col-2"></div>
+                </div>
+            </div>
+            <div class="detail-address-text">如：地址填写尽量详细，如xx楼xx室；</div>
+            <div class="panel">
+                <div class="button submit">保存</div>
+            </div>
+        </div>
+    </div>
+    <div class="page-mask"></div>
+</section>
+    #parse("appbar.vm")
+<script src="http://$!{host}/h5/js/lib/main.js?v=$!{ver}"></script>
+<script>
+    require('h5/js/page/editAddress', function (page) {
+        page.show();
+    });
+</script>
+    #parse("footer.vm")
+</body>
+</html>

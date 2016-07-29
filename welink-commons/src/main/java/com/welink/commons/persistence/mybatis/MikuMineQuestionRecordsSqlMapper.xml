@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.welink.commons.persistence.MikuMineQuestionRecordsMapper" >
+  <resultMap id="oneRecordModel" type="com.welink.commons.domain.MikuMineQuestionRecords" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="version" property="version" jdbcType="BIGINT" />
+    <result column="date_created" property="dateCreated" jdbcType="TIMESTAMP" />
+    <result column="last_updated" property="lastUpdated" jdbcType="TIMESTAMP" />
+    <result column="option_id" property="optionId" jdbcType="BIGINT" />
+    <result column="option_value" property="optionValue" jdbcType="VARCHAR" />
+    <result column="question_id" property="questionId" jdbcType="BIGINT" />
+    <result column="question_name" property="questionName" jdbcType="VARCHAR" />
+    <result column="question_type" property="questionType" jdbcType="TINYINT" />
+    <result column="questionnaire_id" property="questionnaireId" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="uuid" property="uuid" jdbcType="VARCHAR" />
+    <result column="parent_qid" property="parentQid" jdbcType="BIGINT" />
+    <result column="childids" property="childids" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="selectRecordsByName" resultMap="oneRecordModel" parameterType="java.util.Map">
+      SELECT 
+    	  version, date_created, last_updated, 
+	      option_id, option_value, question_id, 
+	      question_name, question_type, questionnaire_id, 
+	      user_id, uuid, parent_qid, 
+	      childids
+       FROM miku_mine_question_records
+       where uuid=#{uuid} and parent_qid=#{qid}
+  </select>
+  
+</mapper>

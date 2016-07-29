@@ -1,0 +1,196 @@
+package rules.promotions;
+dialect  "mvel"
+
+import com.welink.commons.domain.CouponDO
+import com.welink.commons.domain.UserCouponDO
+import com.welink.commons.domain.UserInteractionRecordsDO
+import com.welink.promotion.PromotionErrorEnum
+import com.welink.promotion.PromotionType
+import com.welink.promotion.CouponType
+import com.welink.promotion.reactive.PromotionResult
+import com.welink.promotion.drools.Utils
+import org.joda.time.DateTime
+import java.util.ArrayList
+import java.util.Date
+import java.util.Random;
+import java.math.BigDecimal
+import java.math.BigInteger
+
+// 直接使用优惠券
+// 先冻结优惠券
+// 冻结优惠券变成以使用
+
+
+// validation
+// 验证优惠券是不是本人的 // user id -> user coupon
+// 已使用的优惠券不能再次使用
+// 验证优惠券是否到期
+// 验证优惠券是否到减慢的最小金额
+
+rule "验证优惠券是不是本人"
+salience 100
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type in (PromotionType.COUPON_USE_IN_TRADE_DIRECT.code,
+        PromotionType.COUPON_USE_IN_TRADE_FROZEN.code, PromotionType.COUPON_USE_IN_TRADE_FROZEN_ELIMINATE.code))
+        userCouponDO : UserCouponDO(userId != userInteractionRecordsDO.userId)
+    then
+        promotionResult.setReward(false);
+        promotionResult.setCode(PromotionErrorEnum.COUPON_HACKED.getCode());
+        promotionResult.setMessage(PromotionErrorEnum.COUPON_HACKED.getMsg());
+		System.err.println("0002[A]-----验证优惠券是不是本人----------->coupon_use_in_trade.drl");
+        update(promotionResult);
+end
+
+rule "对使用中的优惠券做操作，只能是直接消费或冻结"
+salience 100
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type in (PromotionType.COUPON_USE_IN_TRADE_DIRECT.code,
+        PromotionType.COUPON_USE_IN_TRADE_FROZEN.code))
+        userCouponDO : UserCouponDO(status != 1)
+    then
+        promotionResult.setReward(false);
+        promotionResult.setCode(PromotionErrorEnum.COUPON_USE_ERROR_TYPE.getCode());
+        promotionResult.setMessage(PromotionErrorEnum.COUPON_USE_ERROR_TYPE.getMsg());
+		System.err.println("0002[B]-----对使用中的优惠券做操作，只能是直接消费或冻结----------->coupon_use_in_trade.drl");
+        update(promotionResult);
+end
+
+rule "冻结优惠券变成已使用，但是优惠券状态不是冻结"
+salience 100
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.COUPON_USE_IN_TRADE_FROZEN_ELIMINATE.code)
+        userCouponDO : UserCouponDO(status != 0)
+    then
+        promotionResult.setReward(false);
+        promotionResult.setCode(PromotionErrorEnum.COUPON_UNFROZEN_ERROR_TYPE.getCode());
+        promotionResult.setMessage(PromotionErrorEnum.COUPON_UNFROZEN_ERROR_TYPE.getMsg());
+		System.err.println("0002[C]-----冻结优惠券变成已使用，但是优惠券状态不是冻结----------->coupon_use_in_trade.drl");
+        update(promotionResult);
+end
+
+rule "优惠券未到使用时间"
+salience 100
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type in (PromotionType.COUPON_USE_IN_TRADE_DIRECT.code,
+        PromotionType.COUPON_USE_IN_TRADE_FROZEN.code, PromotionType.COUPON_USE_IN_TRADE_FROZEN_ELIMINATE.code))
+        userCouponDO : UserCouponDO(startTime != null, endTime != null, startTime.after(new Date()))
+    then
+        promotionResult.setReward(false);
+        promotionResult.setCode(PromotionErrorEnum.COUPON_USE_BEFORE_START_TIME.getCode());
+        promotionResult.setMessage(PromotionErrorEnum.COUPON_USE_BEFORE_START_TIME.getMsg());
+		System.err.println("0002[D]-----优惠券未到使用时间----------->coupon_use_in_trade.drl");
+
+        update(promotionResult);
+end
+
+rule "或者使用时间已过"
+salience 100
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type in (PromotionType.COUPON_USE_IN_TRADE_DIRECT.code,
+        PromotionType.COUPON_USE_IN_TRADE_FROZEN.code, PromotionType.COUPON_USE_IN_TRADE_FROZEN_ELIMINATE.code))
+        userCouponDO : UserCouponDO(startTime != null, endTime != null, endTime.before(new Date()))
+    then
+        promotionResult.setReward(false);
+        promotionResult.setCode(PromotionErrorEnum.COUPON_USE_AFTER_END_TIME.getCode());
+        promotionResult.setMessage(PromotionErrorEnum.COUPON_USE_AFTER_END_TIME.getMsg());
+		System.err.println("0002[E]-----或者使用时间已过----------->coupon_use_in_trade.drl");
+
+        update(promotionResult);
+end
+
+rule "验证交易有没有到优惠券的最小金额"
+salience 100
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type in (PromotionType.COUPON_USE_IN_TRADE_DIRECT.code,
+        PromotionType.COUPON_USE_IN_TRADE_FROZEN.code))
+        userCouponDO : UserCouponDO()
+        CouponDO(userCouponDO.couponId == id, minValue > userInteractionRecordsDO.value)
+    then
+        promotionResult.setReward(false);
+        promotionResult.setCode(PromotionErrorEnum.COUPON_UNDER_MIN_VALUE.getCode());
+        promotionResult.setMessage(PromotionErrorEnum.COUPON_UNDER_MIN_VALUE.getMsg());
+	    System.err.println("0002[F]-----验证交易有没有到优惠券的最小金额---------->coupon_use_in_trade.drl");
+        update(promotionResult);
+end
+
+rule "优惠券的直接使用"
+salience 10
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.COUPON_USE_IN_TRADE_DIRECT.code)
+        userCouponDO : UserCouponDO(startTime != null, endTime != null, startTime.before(new Date()), endTime.after(new Date()), status == 1)
+        couponDO : CouponDO(userCouponDO.couponId == id, minValue <= userInteractionRecordsDO.value)
+    then
+        promotionResult.setReward(true);
+        userCouponDO.setStatus((byte) (-1));
+        userCouponDO.setLastUpdated(new Date());
+         System.err.println("0002[G]-----优惠券的直接使用---------->coupon_use_in_trade.drl");
+        update(promotionResult);
+end
+
+rule "优惠券做冻结"
+salience 10
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.COUPON_USE_IN_TRADE_FROZEN.code)
+        userCouponDO : UserCouponDO(startTime != null, endTime != null, startTime.before(new Date()), endTime.after(new Date()), status == 1)
+        couponDO : CouponDO(userCouponDO.couponId == id, minValue <= userInteractionRecordsDO.value)
+    then
+        promotionResult.setReward(true);
+        userCouponDO.setStatus((byte)(0));
+        userCouponDO.setLastUpdated(new Date());
+ 		System.err.println("0002[H]-----优惠券做冻结---------->coupon_use_in_trade.drl");
+        update(promotionResult);
+end
+
+rule "冻结优惠券变成已使用"
+salience 10
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.COUPON_USE_IN_TRADE_FROZEN_ELIMINATE.code)
+        userCouponDO : UserCouponDO(status == 0)
+    then
+        promotionResult.setReward(true);
+        userCouponDO.setStatus((byte) (-1));
+        userCouponDO.setLastUpdated(new Date());
+        System.err.println("0002[I]-----冻结优惠券变成已使用---------->coupon_use_in_trade.drl");
+        update(promotionResult);
+end
+
+rule "冻结优惠券变成未使用"
+salience 10
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.COUPON_USE_IN_TRADE_FROZEN_RESTORE.code)
+        userCouponDO : UserCouponDO(status == 0)
+    then
+        promotionResult.setReward(true);
+        userCouponDO.setStatus((byte) (1));
+        userCouponDO.setLastUpdated(new Date());
+  		System.err.println("0002[J]-----冻结优惠券变成未使用---------->coupon_use_in_trade.drl");
+        update(promotionResult);
+end
+
+//rule "测试第二份文件"
+//salience 100
+//lock-on-active
+	//when 
+		//eval(true);
+	//then
+	   // System.out.println("测试2");

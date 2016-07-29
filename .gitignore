@@ -1,0 +1,13 @@
+.DS_Store
+.settings
+.project
+.classpath
+target/
+.svn/
+*.iml
+.idea/
+welink_logs/
+**/target
+**/.settings
+**/.project
+**/.classpath

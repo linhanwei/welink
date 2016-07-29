@@ -1,0 +1,212 @@
+package rules.promotions;
+dialect  "mvel"
+
+import com.welink.commons.domain.UserInteractionRecordsDO
+import com.welink.promotion.PromotionType
+import com.welink.promotion.reactive.PromotionResult
+import com.welink.commons.domain.PointRecordDO
+import com.welink.commons.domain.PointAccountDO
+import com.welink.promotion.drools.Utils
+
+import java.util.Date
+import java.util.List
+import org.joda.time.DateTime
+import org.apache.commons.lang3.builder.ToStringBuilder
+import com.welink.promotion.PromotionErrorEnum
+
+// validation
+// 插入两个UserInteractionRecordsDO，其中一个是没有插入的，一个是数据库最新的
+// 首先判断这次交互是不是有效交互，如果都是有效交互，调整用户积分
+
+rule "如果今天已经签到了，拒绝再次签到获积分"
+salience 100
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        // 匹配到数据库的，并且是签到，并且是今天的签到纪录
+        UserInteractionRecordsDO(id != null, type == PromotionType.POINT_SIGN_IN.code, Utils.isToday(dateCreated))
+    then
+        promotionResult.setReward(Boolean.FALSE);
+        promotionResult.setCode(PromotionErrorEnum.POINT_ALREADY_RECEIVE.getCode());
+        promotionResult.setMessage(PromotionErrorEnum.POINT_ALREADY_RECEIVE.getMsg());
+         System.err.println("0003[A]-----如果今天已经签到了，拒绝再次签到获积分---------->point_acquire_sign_in.drl");
+        update(promotionResult)
+end
+
+rule "新人领积分，如果已经领取了"
+    salience 100
+    lock-on-active
+    when
+        UserInteractionRecordsDO(id != null, type == PromotionType.POINT_NEW_USER.code)
+        promotionResult : PromotionResult(reward == null)
+        pointAccountDO : PointAccountDO()
+        pointRecordDO : PointRecordDO()
+    then
+        promotionResult.setReward(false);
+        promotionResult.code = PromotionErrorEnum.POINT_ROOKIE_PRESENT_ALREADY_RECEIVED.getCode();
+        promotionResult.message = PromotionErrorEnum.POINT_ROOKIE_PRESENT_ALREADY_RECEIVED.getMsg();
+        System.err.println("0003[B]-----新人领积分，如果已经领取了---------->point_acquire_sign_in.drl");
+        update(promotionResult);
+
+end
+
+
+
+// reward points
+// 如果一切规则都PASS了，那么开始签到给积分了
+rule "如果昨天的数据库交互纪录不存在，说明是第一天交互"
+    salience 10
+    lock-on-active
+    when
+        (not UserInteractionRecordsDO(id != null, type == PromotionType.POINT_SIGN_IN.code) or UserInteractionRecordsDO(id != null, type == PromotionType.POINT_SIGN_IN.code, !Utils.isYesterday(dateCreated)))
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_SIGN_IN.code)
+        promotionResult : PromotionResult(reward == null)
+        pointAccountDO : PointAccountDO()
+        pointRecordDO : PointRecordDO()
+    then
+        promotionResult.setReward(true);
+        // 交互
+        userInteractionRecordsDO.setValue(1);
+
+        // 积分账户
+        pointAccountDO.setVersion(pointAccountDO.version == null ? 2L : (pointAccountDO.version + 1L));
+        pointAccountDO.setAvailableBalance(pointAccountDO.availableBalance == null ? 0L : pointAccountDO.availableBalance + 10L);
+        pointAccountDO.setLastUpdated(new Date());
+
+        // 积分纪录
+        pointRecordDO.setVersion(1L);
+        pointRecordDO.setAvailableBalance(pointAccountDO.getAvailableBalance());
+        pointRecordDO.setAmount(10L);
+        pointRecordDO.setType(PromotionType.POINT_SIGN_IN.getCode());
+        pointRecordDO.setLastUpdated(new Date());
+        System.err.println("0003[C]-----如果昨天的数据库交互纪录不存在，说明是第一天交互---------->point_acquire_sign_in.drl");
+        update(promotionResult);
+
+end
+
+rule "如果数据库交互纪录存在，交互时间<7天"
+    salience 10
+    lock-on-active
+    when
+        UserInteractionRecordsDO(id != null, type == PromotionType.POINT_SIGN_IN.code, Utils.isYesterday(dateCreated),  $last : value < 7 && value > 0)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_SIGN_IN.code)
+        promotionResult : PromotionResult(reward == null)
+        pointAccountDO : PointAccountDO()
+        pointRecordDO : PointRecordDO()
+    then
+        promotionResult.setReward(true);
+
+        // 交互
+        userInteractionRecordsDO.setValue($last + 1);
+
+        // 积分账户
+        pointAccountDO.setVersion(pointAccountDO.version == null ? 2L : (pointAccountDO.version + 1L));
+        pointAccountDO.setAvailableBalance((pointAccountDO.availableBalance == null ? 0L : pointAccountDO.availableBalance) + (10L + 5L * $last));
+        pointAccountDO.setLastUpdated(new Date());
+
+        // 积分纪录
+        pointRecordDO.setVersion(1L);
+        pointRecordDO.setAvailableBalance(pointAccountDO.getAvailableBalance());
+        pointRecordDO.setAmount(10L + 5L * $last);
+        pointRecordDO.setType(PromotionType.POINT_SIGN_IN.getCode());
+        pointRecordDO.setLastUpdated(new Date());
+        System.err.println("0003[D]-----如果数据库交互纪录存在，交互时间<7天---------->point_acquire_sign_in.drl");
+        update(promotionResult);
+
+end
+
+rule "如果数据库交互纪录存在，交互时间>=7天"
+    salience 10
+    lock-on-active
+    when
+        UserInteractionRecordsDO(id != null, type == PromotionType.POINT_SIGN_IN.code, $last : value >= 7)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_SIGN_IN.code)
+        promotionResult : PromotionResult(reward == null)
+        pointAccountDO : PointAccountDO()
+        pointRecordDO : PointRecordDO()
+    then
+        promotionResult.setReward(true);
+
+        // 交互
+        userInteractionRecordsDO.setValue($last + 1);
+
+        // 积分账户
+        pointAccountDO.setVersion(pointAccountDO.version == null ? 2L : (pointAccountDO.version + 1L));
+        pointAccountDO.setAvailableBalance(pointAccountDO.availableBalance == null ? 0L : pointAccountDO.availableBalance + 40L);
+        pointAccountDO.setLastUpdated(new Date());
+
+        // 积分纪录
+        pointRecordDO.setVersion(1L);
+        pointRecordDO.setAvailableBalance(pointAccountDO.getAvailableBalance() == null ? 0L : pointAccountDO.getAvailableBalance());
+        pointRecordDO.setAmount(40L);
+        pointRecordDO.setType(PromotionType.POINT_SIGN_IN.getCode());
+        pointRecordDO.setLastUpdated(new Date());
+         System.err.println("0003[E]-----如果数据库交互纪录存在，交互时间>=7天---------->point_acquire_sign_in.drl");
+        update(promotionResult);
+end
+
+rule "购物领取积分"
+    salience 10
+    lock-on-active
+    when
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_TRADE_SUCCESS.code, targetId != null, $p : value > 100)
+        promotionResult : PromotionResult(reward == null)
+        pointAccountDO : PointAccountDO()
+        pointRecordDO : PointRecordDO()
+    then
+        promotionResult.setReward(true);
+
+
+        // 积分账户
+        pointAccountDO.setVersion(pointAccountDO.version == null ? 2L : (pointAccountDO.version + 1L));
+        pointAccountDO.setAvailableBalance(pointAccountDO.availableBalance == null ? 0L : pointAccountDO.availableBalance + $p / 100);
+        pointAccountDO.setLastUpdated(new Date());
+
+        // 积分纪录
+        pointRecordDO.setVersion(1L);
+        pointRecordDO.setAvailableBalance(pointAccountDO.getAvailableBalance() == null ? 0L : pointAccountDO.getAvailableBalance());
+        pointRecordDO.setAmount($p / 100L);
+        pointRecordDO.setType(PromotionType.POINT_TRADE_SUCCESS.getCode());
+        pointRecordDO.setTradeId(Long.parseLong(userInteractionRecordsDO.getTargetId()));
+        pointRecordDO.setLastUpdated(new Date());
+        System.err.println("0003[F]-----购物领取积分---------->point_acquire_sign_in.drl");
+        update(promotionResult);
+end
+
+rule "新人领积分"
+    salience 10
+    lock-on-active
+    when
+        not UserInteractionRecordsDO(id != null, type == PromotionType.POINT_NEW_USER.code)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_NEW_USER.code)
+        promotionResult : PromotionResult(reward == null)
+        pointAccountDO : PointAccountDO()
+        pointRecordDO : PointRecordDO()
+    then
+        promotionResult.setReward(true);
+        // 交互
+        userInteractionRecordsDO.setValue(1);
+
+        // 积分账户
+        pointAccountDO.setVersion(pointAccountDO.version == null ? 2L : (pointAccountDO.version + 1L));
+        pointAccountDO.setAvailableBalance(pointAccountDO.availableBalance == null ? 0L : pointAccountDO.availableBalance + 500L);
+        pointAccountDO.setLastUpdated(new Date());
+
+        // 积分纪录
+        pointRecordDO.setVersion(1L);
+        pointRecordDO.setAvailableBalance(pointAccountDO.getAvailableBalance());
+        pointRecordDO.setAmount(500L);
+        pointRecordDO.setType(PromotionType.POINT_NEW_USER.getCode());
+        pointRecordDO.setLastUpdated(new Date());
+		System.err.println("0003[H]-----新人领积分---------->point_acquire_sign_in.drl");
+        update(promotionResult);
+
+end
+
+//rule "003"
+ 	//salience 2
+ 	//when 
+ 	//	eval(true)
+ 	//then
+ 	//	System.err.println("003的测试rule")
+ 	//end

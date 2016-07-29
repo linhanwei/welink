@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>选择小区</title>
+    #parse("head.vm")
+    <script>
+        require('h5/js/page/community', function (page) {
+            page.show();
+        });
+    </script>
+</head>
+<body>
+<section class="page slide" id="communityPage">
+    <div class="page-content fade">
+        <div data-role-scrollable="true" class="page-scroll-panel">
+            <ul class="community-list"></ul>
+        </div>
+    </div>
+</section>
+    #parse("appbar.vm")
+<script src="http://$!{host}/h5/js/lib/main.js?v=$!{ver}"></script>
+    #parse("footer.vm")
+</body>
+</html>

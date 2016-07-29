@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.welink.commons.persistence.MikuMineQuestionsDOMapper" >
+  <resultMap id="oneQuestionModel" type="com.welink.commons.domain.MikuMineQuestionsDO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="sc_problem_id" property="scProblemId" jdbcType="BIGINT" />
+    <result column="question_show_order" property="questionShowOrder" jdbcType="INTEGER" />
+    <result column="question_name" property="questionName" jdbcType="VARCHAR" />
+    <result column="question_short_name" property="questionShortName" jdbcType="VARCHAR" />
+    <result column="question_des" property="questionDes" jdbcType="VARCHAR" />
+    <result column="options_selectable_type" property="optionsSelectableType" jdbcType="TINYINT" />
+    <result column="options_selectable_maxnum" property="optionsSelectableMaxnum" jdbcType="INTEGER" />
+    <result column="creater_id" property="createrId" jdbcType="BIGINT" />
+    <result column="version" property="version" jdbcType="BIGINT" />
+    <result column="date_created" property="dateCreated" jdbcType="TIMESTAMP" />
+    <result column="last_updated" property="lastUpdated" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <select id="selectQuestionByids" resultMap="oneQuestionModel" parameterType="java.util.Map">
+      SELECT 
+    	    id, sc_problem_id, question_show_order, question_name, question_short_name, question_des, 
+		    options_selectable_type, options_selectable_maxnum, creater_id, version, date_created, 
+		    last_updated
+       FROM miku_mine_questions
+       where sc_problem_id in (${ids})
+  </select>
+</mapper>

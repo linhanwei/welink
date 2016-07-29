@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>购买礼包</title>
+    #parse("head.vm")
+    <link rel="stylesheet" href="http://$!{host}/h5/css/page/buyForJoinAgencyPage.css?v=$!{ver}"/>
+    <script>
+	    var pageConfig = {
+	        openid: "$!{openid}",
+	        appid: "$!{appid}",
+	        shopid: "$!{shop_id}",
+	        pid: "$!{profileId}", 
+	        price: "$!{price}",
+	        totalFee: "$!{totalFee}",
+	        canJoinAgencyFee: "$!{canJoinAgencyFee}"
+	    }
+	</script>
+</head>
+<body>
+<div class="waitting" style="margin-left: -44px; margin-top: -40px;">
+    <div class="loading"></div>
+    <div class="message">正在加载...</div>
+</div>
+<script src="http://$!{host}/h5/js/lib/main.js?v=$!{ver}"></script>
+<script src="http://$!{host}/h5/js/page/buyForJoinAgencyPage.js?v=$!{ver}"></script>
+    #parse("footer.vm")
+</body>
+</html>

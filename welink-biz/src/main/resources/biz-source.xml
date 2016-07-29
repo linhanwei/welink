@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <beans profile="dev">
+        <bean id="notifyService" class="com.welink.biz.service.NotifyAdminService">
+            <property name="url" value="http://welinjia.com:9001/callback/notification"/>
+        </bean>
+    </beans>
+
+    <beans profile="test">
+        <bean id="notifyService" class="com.welink.biz.service.NotifyAdminService">
+            <property name="url" value="http://welinjia.com:9001/callback/notification"/>
+        </bean>
+    </beans>
+
+    <beans profile="prod">
+        <bean id="notifyService" class="com.welink.biz.service.NotifyAdminService">
+            <property name="url" value="http://welinjia.com:9001/callback/notification"/>
+        </bean>
+    </beans>
+
+    <!-- avos source-->
+    <beans profile="dev">
+        <bean id="pushSource" class="com.welink.biz.common.model.PushSource">
+            <property name="avosAppIdValue" value="vqsfh7z4djtsevo4p9xh4q7n2e4phcatks36342b8dp62n72"/>
+            <property name="avosAppClientKey" value="eu1m7dvxxx7y2oa5frf9nqs8z2m0lwghye3nva38g0m1vfvg"/>
+        </bean>
+    </beans>
+
+    <beans profile="test">
+        <bean id="pushSource" class="com.welink.biz.common.model.PushSource">
+            <property name="avosAppIdValue" value="vqsfh7z4djtsevo4p9xh4q7n2e4phcatks36342b8dp62n72"/>
+            <property name="avosAppClientKey" value="eu1m7dvxxx7y2oa5frf9nqs8z2m0lwghye3nva38g0m1vfvg"/>
+        </bean>
+    </beans>
+
+    <beans profile="prod">
+        <bean id="pushSource" class="com.welink.biz.common.model.PushSource">
+            <property name="avosAppIdValue" value="wtzdt5kmqsd4yhta6kbggh3f8cmexn6grgndyxc3byetjt4b"/>
+            <property name="avosAppClientKey" value="evn3bgnfqhzp2macj4fkciajmsotq5p86aofjwo688rqr4p6"/>
+        </bean>
+    </beans>
+
+
+</beans>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.welink.commons.persistence.TradeMapper" >
+	<select id="sumByBuyer" resultType="Map" parameterType="java.util.Map" >
+	    <!--
+	      WARNING - @mbggenerated
+	    -->
+	   select
+	    	sum(IFNULL(price,0)) as price, sum(IFNULL(total_fee, 0)) totalFee
+	    from trade
+	    <where>
+	    	crowdfund_refund_status = 0 and return_status = 0
+	    	and status not in (1,2,9)
+		    <if test="profileId != null and profileId > 0" >
+		    	and buyer_id = #{profileId,jdbcType=BIGINT}
+		    </if>
+		    <if test="type != null" >
+		    	and type = #{type,jdbcType=TINYINT}
+		    </if>
+		    <!-- <if test="status != null and status > 0" >
+		    	and status = #{status,jdbcType=TINYINT}
+		    </if> -->
+	    </where>
+	 </select>
+	 
+	<!--  更新商品库存 -->
+	 <update id="updateItemNum" parameterType="java.util.Map">
+	 	update item set 
+	 			num  = if(IFNULL(sold_quantity,0) + #{num,jdbcType=INTEGER} >= 0,
+		    				IFNULL(num,0) - #{num,jdbcType=INTEGER},
+		    				0),
+	 			sold_quantity = if(IFNULL(sold_quantity,0) + #{num,jdbcType=INTEGER} >= 0,
+	 								IFNULL(sold_quantity,0) + #{num,jdbcType=INTEGER},
+	 								sold_quantity),
+		    	version = IFNULL(version,0) + 1,
+		    	last_updated = SYSDATE()
+		where id = #{itemId,jdbcType=BIGINT}
+			and IFNULL(num,0) - #{num,jdbcType=INTEGER} >= 0
+			and IFNULL(num,0) >= 0
+	 </update>
+	 
+	<!--  更新团购库存 -->
+	 <update id="updateGrouponItemNum" parameterType="java.util.Map">
+	 	update Groupon set 
+	 			Quantity  = IFNULL(Quantity,0) - #{num,jdbcType=INTEGER},
+	 			sold_quantity = IFNULL(sold_quantity,0) + #{num,jdbcType=INTEGER},
+		    	version = IFNULL(version,0) + 1,
+		    	last_updated = SYSDATE()
+		where item_Id = #{itemId,jdbcType=BIGINT}
+			and IFNULL(Quantity,0) - #{num,jdbcType=INTEGER} >= 0
+			and IFNULL(Quantity,0) >= 0
+	 </update>
+	 
+	 <!--  更新抢购标商品库存 -->
+	 <update id="updateObjectTaggedNumById" parameterType="java.util.Map">
+	 	update object_tagged set 
+	 			activity_num  = if(IFNULL(activity_sold_num,0) + #{num,jdbcType=INTEGER} >= 0 , 
+		    						IFNULL(activity_num,0) - #{num,jdbcType=INTEGER},
+		    						activity_num),
+	 			activity_sold_num = if(IFNULL(activity_sold_num,0) + #{num,jdbcType=INTEGER} >= 0 , 
+	 									IFNULL(activity_sold_num,0) + #{num,jdbcType=INTEGER}, 
+	 									activity_sold_num),
+		    	version = IFNULL(version,0) + 1,
+		    	last_updated = SYSDATE()
+		where id = #{objectTaggedId,jdbcType=BIGINT}
+			and IFNULL(activity_num,0) - #{num,jdbcType=INTEGER} >= 0
+			and IFNULL(activity_num,0) >= 0
+			<!-- and IFNULL(activity_num,0) + #{num,jdbcType=INTEGER} >= 0 -->
+	 </update>
+	 
+	 <!-- 更新一元购人次 -->
+	 <update id="updateOneBuyTimes" parameterType="java.util.Map">
+	 	update miku_one_buy set 
+		    	times  = IFNULL(times,0) - #{times,jdbcType=INTEGER},
+		    	last_updated = SYSDATE()
+		where id = #{itemId,jdbcType=BIGINT}
+			and IFNULL(times,0) - #{times,jdbcType=INTEGER} >= 0
+			and IFNULL(times,0) >= 0
+	 </update>
+	 
+	 <!-- 更新众筹支持数 -->
+	 <update id="updateCrowdfundSoldNum" parameterType="java.util.Map">
+	 	update miku_crowdfund set 
+		    	sold_num  = IFNULL(sold_num,0) + #{soldNum,jdbcType=INTEGER},
+		    	total_fee  = IFNULL(total_fee,0) + #{totalFee,jdbcType=BIGINT},
+		    	last_updated = SYSDATE()
+		where id = #{id,jdbcType=BIGINT}
+	 </update>
+	 
+	 <!-- 更新众筹明细支持数 -->
+	 <update id="updateCrowdfundDetailSoldNum" parameterType="java.util.Map">
+	 	update miku_crowdfund_detail set 
+		    	sold_num  = IFNULL(sold_num,0) + #{soldNum,jdbcType=INTEGER},
+		    	last_updated = SYSDATE()
+		where id = #{id,jdbcType=BIGINT}
+	 </update>
+  
+  	<select id="getCanReturnOrders" resultMap="com.welink.commons.persistence.OrderMapper.BaseResultMap" parameterType="java.util.Map" >
+    <!--
+    	可退货订单列表（getCanReturnOrders）
+    -->
+    select 
+		o.id, o.trade_id, o.version, o.artificial_id, o.buyer_id, o.buyer_rate, o.category_id, o.community_id, 
+	    o.consign_time, o.date_created, o.end_time, o.is_service_order, o.last_updated, o.num, o.order_from, 
+	    o.payment, o.pic_url, o.price, o.seller_id, o.seller_type, o.shipping_type, o.snapshot, o.snapshot_id, 
+	    o.timeout_action_time, o.title, o.total_fee, o.is_activity, o.profit_parameter, o.item_cost_fee, 
+	    o.item_profit_fee, o.item_share_fee, o.return_status, t.status
+	from t_order o
+	left JOIN trade t on o.trade_id = t.trade_id
+	<where>
+		o.artificial_id > 0
+		<if test="buyerId != null">
+			and o.buyer_id = #{buyerId,jdbcType=BIGINT}
+		</if>
+		<if test="notInReturnStatus != null">
+			and (o.return_status not in
+			<foreach collection="notInReturnStatus" item="listItem" index="index" open="(" close=")" separator="," >
+              #{listItem}
+            </foreach> or o.return_status is null)
+		</if>
+		<if test="timeoutActionTime != null">
+			and t.timeout_action_time &gt;= #{timeoutActionTime,jdbcType=TIMESTAMP}
+		</if>
+	</where>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      limit ${limit}
+    </if>
+    <if test="offset != null" >
+      offset ${offset}
+    </if>
+  </select>
+  
+</mapper>

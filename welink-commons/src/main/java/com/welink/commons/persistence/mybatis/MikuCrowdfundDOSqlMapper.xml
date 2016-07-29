@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.welink.commons.persistence.MikuCrowdfundDOMapper" >
+	 <update id="updateCrowdfundStatusByOutTime">
+		<!-- 更新时间过期了的众筹状态为成功[1]或失败[2]和更新交易的众筹退款状态为申请中[1]和交易状态为交易完成-->
+	 	<!-- update miku_crowdfund crowd LEFT JOIN trade tr on crowd.id = tr.crowdfund_id
+	 		set crowd.status = IF( crowd.total_fee >= crowd.target_amount, '1', '2'),
+	 			tr.crowdfund_refund_status = IF( crowd.total_fee >= crowd.target_amount, tr.crowdfund_refund_status,'1'),
+	 			tr.status = IF( crowd.total_fee >= crowd.target_amount, tr.status,20)
+	 	where crowd.end_time &lt; SYSDATE() and crowd.status = 0 and tr.status != 9 -->
+	 	update miku_crowdfund crowd LEFT JOIN trade tr on crowd.id = tr.crowdfund_id
+	 		set crowd.status = IF( crowd.total_fee >= crowd.target_amount, '1', '2'),
+	 			tr.crowdfund_refund_status = IF( crowd.total_fee >= crowd.target_amount, 3, if(tr.status &lt; 3, tr.crowdfund_refund_status, if(tr.status = 9, tr.crowdfund_refund_status, 1))),
+	 			tr.status = IF( crowd.total_fee >= crowd.target_amount, tr.status, if(tr.status &lt; 3, tr.status, if(tr.status = 9, tr.status, 8)))
+	 	where crowd.end_time &lt; SYSDATE() and crowd.status = 0 and tr.crowdfund_refund_status=0
+	 </update>
+	 
+</mapper>

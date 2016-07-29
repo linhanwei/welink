@@ -1,0 +1,222 @@
+package rules.promotions;
+dialect  "mvel"
+
+import com.welink.commons.domain.CouponDO
+import com.welink.commons.domain.UserCouponDO
+import com.welink.commons.domain.UserInteractionRecordsDO
+import com.welink.promotion.PromotionErrorEnum
+import com.welink.promotion.PromotionType
+import com.welink.promotion.CouponType
+import com.welink.promotion.reactive.PromotionResult
+import com.welink.promotion.drools.Utils
+import org.joda.time.DateTime
+import java.util.ArrayList
+import java.util.Date
+import java.util.Random;
+import java.math.BigDecimal
+import java.math.BigInteger
+import com.welink.commons.vo.LotteryDrawRewardVO
+
+// 通过抽奖来获取积分、优惠券、商品等奖品
+
+// validation
+rule "抽奖，每天只能抽三次"
+salience 100
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        ArrayList(size() >= 3 ) from collect (
+            UserInteractionRecordsDO(id != null, type == PromotionType.POINT_LOTTERY_DRAW.code 
+            	|| type == PromotionType.COUPON_LOTTERY_DRAW.code || type == PromotionType.ITEM_LOTTERY_DRAW.code, Utils.isToday(dateCreated))
+        )
+    then
+        promotionResult.reward = false;
+        promotionResult.code = PromotionErrorEnum.LOTTERY_DRAW_LIMITED.getCode();
+        promotionResult.message = PromotionErrorEnum.LOTTERY_DRAW_LIMITED.getMsg();
+
+        update(promotionResult);
+end
+
+rule "抽奖积分一天只能够中一次奖"
+salience 100
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+         UserInteractionRecordsDO(id != null && Utils.isToday(dateCreated) && 
+	        	type in (PromotionType.POINT_LOTTERY_DRAW.code, PromotionType.COUPON_LOTTERY_DRAW.code
+	        		, PromotionType.ITEM_LOTTERY_DRAW.code))
+//        UserInteractionRecordsDO(id != null, type == PromotionType.POINT_LOTTERY_DRAW.code, Utils.isToday(dateCreated))
+//        exists(UserInteractionRecordsDO(id != null, type == PromotionType.POINT_LOTTERY_DRAW.code, Utils.isToday(dateCreated))
+//	        	or UserInteractionRecordsDO(id != null, type == PromotionType.COUPON_LOTTERY_DRAW.code, Utils.isToday(dateCreated))
+//	        	or UserInteractionRecordsDO(id != null, type == PromotionType.ITEM_LOTTERY_DRAW.code, Utils.isToday(dateCreated))
+//	        )
+    then
+        promotionResult.reward = false;
+        promotionResult.code = PromotionErrorEnum.LOTTERY_DRAW_LIMITED.getCode();
+        promotionResult.message = PromotionErrorEnum.LOTTERY_DRAW_LIMITED.getMsg();
+
+        update(promotionResult);
+end
+
+//rule "抽奖优惠券一天只能够中一次奖"
+//salience 100
+//lock-on-active
+//    when
+//        promotionResult : PromotionResult(reward == null)
+//        UserInteractionRecordsDO(id != null, type == PromotionType.COUPON_LOTTERY_DRAW.code, Utils.isToday(dateCreated))
+//    then
+//        promotionResult.reward = false;
+//        promotionResult.code = PromotionErrorEnum.LOTTERY_DRAW_LIMITED.getCode();
+//        promotionResult.message = PromotionErrorEnum.LOTTERY_DRAW_LIMITED.getMsg();
+//
+//        update(promotionResult);
+//end
+//
+//rule "抽奖商品只能够中一次奖"
+//salience 100
+//lock-on-active
+//    when
+//        promotionResult : PromotionResult(reward == null)
+//        UserInteractionRecordsDO(id != null, type == PromotionType.ITEM_LOTTERY_DRAW.code, Utils.isToday(dateCreated))
+//    then
+//        promotionResult.reward = false;
+//        promotionResult.code = PromotionErrorEnum.LOTTERY_DRAW_LIMITED.getCode();
+//        promotionResult.message = PromotionErrorEnum.LOTTERY_DRAW_LIMITED.getMsg();
+//
+//        update(promotionResult);
+//end
+
+rule "设置抽奖概率"
+salience 100
+lock-on-active
+    when
+		promotionResult : PromotionResult(reward == null)
+        lotteryDrawRewardVO : LotteryDrawRewardVO()
+    then
+        boolean flag = true;
+		if(flag && lotteryDrawRewardVO.getType().equals(1) && Utils.lucky("0.1")){	//0.03
+			lotteryDrawRewardVO.setIndex(1001);
+			lotteryDrawRewardVO.index=1001;
+			flag = false;
+		}
+		if(flag && lotteryDrawRewardVO.getType().equals(1) && Utils.lucky("0.07")){	//0.01
+			lotteryDrawRewardVO.setIndex(1002);
+			flag = false;
+		}
+		if(flag && lotteryDrawRewardVO.getType().equals(2) && Utils.lucky("0.2")){	//0.05
+			lotteryDrawRewardVO.setIndex(2001);
+			flag = false;
+		}
+		//if(flag && lotteryDrawRewardVO.getType().equals(3) && Utils.lucky("0.005")){
+		if(flag && lotteryDrawRewardVO.getType().equals(3) && Utils.lucky("0.1")){	//0.05
+			lotteryDrawRewardVO.setIndex(3001);
+			flag = false;
+		}
+		if(flag && lotteryDrawRewardVO.getType().equals(3) && Utils.lucky("0.1")){	//0.05
+			lotteryDrawRewardVO.setIndex(3002);
+			flag = false;
+		}
+		if(flag && lotteryDrawRewardVO.getType().equals(3) && Utils.lucky("0.01")){	//0.005
+			lotteryDrawRewardVO.setIndex(3003);
+			flag = false;
+		}
+		System.err.println("0003[H]-----抽奖设置Index---------->lotteryDraw.drl:"+lotteryDrawRewardVO.getIndex());
+        update(lotteryDrawRewardVO);
+end
+
+rule "抽奖领积分"
+    salience 10
+    lock-on-active
+    when
+        //not UserInteractionRecordsDO(id != null, type == PromotionType.POINT_LOTTERY_DRAW.code)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_LOTTERY_DRAW.code)
+        promotionResult : PromotionResult(reward == null)
+        pointAccountDO : PointAccountDO()
+        pointRecordDO : PointRecordDO()
+        lotteryDrawRewardVO : LotteryDrawRewardVO(type == 1)
+    then
+    	if(lotteryDrawRewardVO.getIndex() > 0){
+	        promotionResult.setReward(true);
+	        // 交互
+	        userInteractionRecordsDO.setValue(1);
+	
+	        // 积分账户
+	        pointAccountDO.setVersion(pointAccountDO.version == null ? 2L : (pointAccountDO.version + 1L));
+	        pointAccountDO.setLastUpdated(new Date());
+	
+	        // 积分纪录
+	        pointRecordDO.setVersion(1L);
+	        pointRecordDO.setAvailableBalance(pointAccountDO.getAvailableBalance() == null ? 0L : pointAccountDO.getAvailableBalance());
+	        pointRecordDO.setType(PromotionType.POINT_LOTTERY_DRAW.getCode());
+	        pointRecordDO.setLastUpdated(new Date());
+	        
+	        if(lotteryDrawRewardVO.getIndex().equals(1001)){
+		        pointAccountDO.setAvailableBalance(pointAccountDO.availableBalance == null ? 500L : (pointAccountDO.availableBalance + 500L));
+		        pointRecordDO.setAmount(500L);
+	        }else if(lotteryDrawRewardVO.getIndex().equals(1002)){
+	       		pointAccountDO.setAvailableBalance(pointAccountDO.availableBalance == null ? 500L : (pointAccountDO.availableBalance + 1000L));
+		        pointRecordDO.setAmount(1000L);
+	        }
+	        
+			System.err.println("0003[H]-----抽奖领积分---------->lotteryDraw.drl");
+	        update(promotionResult);
+        }
+
+end
+
+rule "抽奖领取优惠券"
+lock-on-active
+salience 10
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.COUPON_LOTTERY_DRAW.code)
+        userCouponDO : UserCouponDO()
+        lotteryDrawRewardVO : LotteryDrawRewardVO(type == 2)
+    then
+    	if(lotteryDrawRewardVO.getIndex() > 0){
+	        promotionResult.setReward(true);
+	        if(lotteryDrawRewardVO.getIndex().equals(2001)){
+		        userCouponDO.setCouponId(39L);
+		        userCouponDO.setCouponType(CouponType.OFF_FOR_CONDITION.getCode());
+	    	}
+	        userCouponDO.setDateCreated(new Date());
+	        userCouponDO.setLastUpdated(new Date());
+	        userCouponDO.setPickTime(new Date());
+	        userCouponDO.setStatus((byte) 1);
+	        userCouponDO.setUserId(userInteractionRecordsDO.getUserId());
+	        userCouponDO.setVersion(1L);
+	        
+	        userCouponDO.setStartTime(new Date());
+	        userCouponDO.setEndTime(new DateTime().plusDays(15).toDate());
+	        
+			System.err.println("0003[H]-----抽奖领取优惠券---------->lotteryDraw.drl");
+	        update(promotionResult);
+	        update(userCouponDO);
+        }
+end
+
+
+rule "抽奖领取商品"
+lock-on-active
+salience 10
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.ITEM_LOTTERY_DRAW.code)
+        lotteryDrawRewardVO : LotteryDrawRewardVO(type == 3)
+    then
+    	if(lotteryDrawRewardVO.getIndex() > 0){
+	    	promotionResult.setReward(true);
+	        if(lotteryDrawRewardVO.getIndex().equals(3001)){
+		        lotteryDrawRewardVO.setRewardId(11021L);	//小样礼包
+	    	}else if(lotteryDrawRewardVO.getIndex().equals(3002)){
+	    		lotteryDrawRewardVO.setRewardId(11021L);	//小样礼包
+	    	}
+	    	else if(lotteryDrawRewardVO.getIndex().equals(3003)){
+	    		lotteryDrawRewardVO.setRewardId(11019L);	//拍立得
+	    	}
+	    	System.err.println("0003[H]-----抽奖领取商品---------->lotteryDraw.drl:"+lotteryDrawRewardVO.getIndex());
+	        update(promotionResult);
+	        update(lotteryDrawRewardVO);
+        }
+end
+

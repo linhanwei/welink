@@ -1,0 +1,24 @@
+<section id="app-bar" class="grid">
+    <ul class="row">
+        <li class="col col-25" href="/api/h/1.0/indexPage.htm">
+            <div class="iconfont index-bar">
+                <div class="title">首页</div>
+            </div>
+        </li>
+        <li class="col col-25" href="/api/h/1.0/listPage.htm">
+            <div class="iconfont list-bar">
+                <div class="title">挑水果</div>
+            </div>
+        </li>
+        <li class="col col-25" href="/api/h/1.0/cartPage.htm">
+            <div class="iconfont cart-bar">
+                <div class="title">购物车</div>
+            </div>
+        </li>
+        <li class="col col-25" href="/api/h/1.0/userCenter.htm">
+            <div class="iconfont user-bar">
+                <div class="title">我的</div>
+            </div>
+        </li>
+    </ul>
+</section>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<property name="LOG_HOME" value="${TAS_HOME:-..}/welink_logs"/>
+    <!-- Output to Console -->
+    <appender name="ConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder charset="UTF-8">
+            <pattern>%d %-4relative [%thread] %-5level %logger{35} [Line:%L] - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="userEvent" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/user_event_track.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/user_event_track.log-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>20MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="base-logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/welink.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/welink.log-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>20MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d %-4relative [%thread] %-5level %logger{35} [Line:%L] - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="backLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/welink-backLog.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+           	<fileNamePattern>${LOG_HOME}/welink-backLog.log-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>4000MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d %-4relative [%thread] %-5level %logger{35} [Line:%L] - %m%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <appender name="myBatis" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/welink-myBatis.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+           	<fileNamePattern>${LOG_HOME}/welink-myBatis.log-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>20MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d %-4relative [%thread] %-5level %logger{35} [Line:%L] - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="timerFilter" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/timerFilter.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/timerFilter.log-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d %-4relative [%thread] %-5level %logger{35} [Line:%L] - %m%n</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="paramslog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/params.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/params.log-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d %-4relative [%thread] %-5level %logger{35} [Line:%L] - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="user-event-track" additivity="false">
+        <appender-ref ref="userEvent"/>
+    </logger>
+
+    <!-- specify the logging level for loggers from other libraries -->
+    <logger name="com.welink.biz" additivity="false">
+        <appender-ref ref="base-logfile"/>
+        <appender-ref ref="ConsoleAppender"/>
+    </logger>
+
+    <logger name="com.welink.commons" additivity="false">
+        <appender-ref ref="base-logfile"/>
+        <appender-ref ref="ConsoleAppender"/>
+    </logger>
+
+    <logger name="com.welink.buy" additivity="false">
+        <level value="debug"/>
+        <appender-ref ref="base-logfile"/>
+        <appender-ref ref="ConsoleAppender"/>
+    </logger>
+
+    <logger name="com.welink.web" additivity="false">
+        <appender-ref ref="base-logfile"/>
+        <appender-ref ref="ConsoleAppender"/>
+    </logger>
+
+    <logger name="com.welink.web.common.filter.TimerFilter" additivity="false">
+        <level value="warn"/>
+        <appender-ref ref="timerFilter"/>
+    </logger>
+
+    <logger name="backLog" additivity="false">
+        <level value="error"/>
+        <appender-ref ref="backLog"/>
+    </logger>
+
+
+    <!-- sql -->
+    <logger name="com.ibatis" additivity="false">
+        <appender-ref ref="myBatis"/>
+    </logger>
+
+    <logger name="java.sql.Connection" additivity="false">
+        <appender-ref ref="myBatis"/>
+    </logger>
+
+    <logger name="java.sql.Statement" additivity="false">
+        <appender-ref ref="myBatis"/>
+    </logger>
+
+    <logger name="java.sql.PreparedStatement" additivity="false">
+        <appender-ref ref="myBatis"/>
+    </logger>
+
+    <logger name="java.sql.ResultSet" additivity="false">
+        <appender-ref ref="myBatis"/>
+    </logger>
+
+    <logger name="java.sql" additivity="false">
+        <level value="DEBUG"/>
+        <appender-ref ref="myBatis"/>
+    </logger>
+    <!-- sql -->
+
+    <logger name="com.opensymphony" additivity="false">
+        <appender-ref ref="base-logfile"/>
+        <appender-ref ref="ConsoleAppender"/>
+    </logger>
+
+    <logger name="org.apache.struts2" additivity="false">
+        <appender-ref ref="base-logfile"/>
+        <appender-ref ref="ConsoleAppender"/>
+    </logger>
+
+    <logger name="com.opensymphony.xwork2" additivity="false">
+        <appender-ref ref="base-logfile"/>
+        <appender-ref ref="ConsoleAppender"/>
+    </logger>
+    
+    <logger name="com.welink.web.common.CommonInterceptor" additivity="false">
+    	<appender-ref ref="base-logfile"/>
+        <appender-ref ref="paramslog"/>
+    </logger>
+    
+    <logger name="com.welink.web.common.filter.ResponseLoggingFilter" additivity="false">
+        <appender-ref ref="paramslog"/>
+    </logger>
+    
+    <root level="info">
+        <appender-ref ref="base-logfile"/>
+        <appender-ref ref="ConsoleAppender"/>
+        <appender-ref ref="myBatis"/>
+    </root>
+
+</configuration>  

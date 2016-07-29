@@ -1,0 +1,196 @@
+package rules.promotions;
+dialect  "mvel"
+
+import com.welink.commons.domain.UserInteractionRecordsDO
+import com.welink.promotion.PromotionType
+import com.welink.promotion.reactive.PromotionResult
+import com.welink.commons.domain.PointRecordDO
+import com.welink.commons.domain.PointAccountDO
+import java.util.Date
+import com.welink.promotion.PromotionErrorEnum
+
+// validation
+rule "积分使用操作检查，如果不存在targetId就抛错"
+salience 100
+lock-on-active
+when
+    promotionResult : PromotionResult(reward == null)
+    userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type in (PromotionType.POINT_USE_IN_TRADE_DIRECT.code,
+    PromotionType.POINT_USE_IN_TRADE_FROZEN.code, PromotionType.POINT_USE_IN_TRADE_FROZEN_ELIMINATE.code), (targetId == null || value == null))
+then
+    promotionResult.setReward(false);
+    promotionResult.setCode(PromotionErrorEnum.POINT_USE_ERROR_TARGET.getCode());
+    promotionResult.setMessage(PromotionErrorEnum.POINT_USE_ERROR_TARGET.getMsg());
+    System.err.println("0004[A]-----积分使用操作检查，如果不存在targetId就抛错---------->point_use_in_trade.drl");
+    update(promotionResult);
+end
+
+rule "使用积分大于可用积分"
+salience 100
+lock-on-active
+when
+    promotionResult : PromotionResult(reward == null)
+    pointAccountDO : PointAccountDO()
+    userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type in (PromotionType.POINT_USE_IN_TRADE_DIRECT.code,
+    PromotionType.POINT_USE_IN_TRADE_FROZEN.code), value > pointAccountDO.availableBalance)
+
+then
+    promotionResult.setReward(false);
+    promotionResult.setCode(PromotionErrorEnum.POINT_USE_ERROR_MORE_THAN_AVAILABLE.getCode());
+    promotionResult.setMessage(PromotionErrorEnum.POINT_USE_ERROR_MORE_THAN_AVAILABLE.getMsg());
+    System.err.println("0004[B]-----使用积分大于可用积分---------->point_use_in_trade.drl");
+    update(promotionResult);
+end
+
+rule "冻结积分清除大于已冻结的积分"
+salience 100
+lock-on-active
+when
+    promotionResult : PromotionResult(reward == null)
+    pointAccountDO : PointAccountDO()
+    userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_USE_IN_TRADE_FROZEN_ELIMINATE.code, value > pointAccountDO.frozenBalance)
+
+then
+    promotionResult.setReward(false);
+    promotionResult.setCode(PromotionErrorEnum.POINT_USE_ERROR_MORE_THAN_FROZEN.getCode());
+    promotionResult.setMessage(PromotionErrorEnum.POINT_USE_ERROR_MORE_THAN_FROZEN.getMsg());
+    System.err.println("0004[C]-----冻结积分清除大于已冻结的积分---------->point_use_in_trade.drl");
+    update(promotionResult);
+end
+
+// 积分的时使用方式：
+// 1. 可以直接使用
+// 2. 可以冻结
+// 3. 可以解冻
+rule "积分直接使用的操作"
+salience 10
+lock-on-active
+    when
+    promotionResult : PromotionResult(reward == null)
+    // 是未插入到数据库里面的数据
+    userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_USE_IN_TRADE_DIRECT.code, targetId != null)
+    pointAccountDO : PointAccountDO()
+    pointRecordDO : PointRecordDO()
+
+    then
+    promotionResult.setReward(true);
+
+    // 积分账户
+    pointAccountDO.setVersion(pointAccountDO.version + 1L);
+    pointAccountDO.setAvailableBalance((pointAccountDO.availableBalance == null ? 0 : pointAccountDO.availableBalance)
+     - (userInteractionRecordsDO.value == null ? 0 : userInteractionRecordsDO.value));
+    pointAccountDO.setLastUpdated(new Date());
+
+    // 积分纪录
+    pointRecordDO.setVersion(1L);
+    pointRecordDO.setAvailableBalance(pointAccountDO.getAvailableBalance() == null ? 0L : pointAccountDO.getAvailableBalance());
+    pointRecordDO.setAmount(userInteractionRecordsDO.getValue() == null ? 0L : (Long.valueOf(userInteractionRecordsDO.getValue())));
+    pointRecordDO.setTradeId(Long.parseLong(userInteractionRecordsDO.getTargetId()));
+    pointRecordDO.setType(PromotionType.POINT_USE_IN_TRADE_DIRECT.getCode());
+    pointRecordDO.setLastUpdated(new Date());
+    pointRecordDO.setDateCreated(new Date());
+     System.err.println("0004[D]-----积分直接使用的操作---------->point_use_in_trade.drl");
+    update(promotionResult);
+end
+
+
+rule "冻结积分操作"
+salience 10
+    when
+
+    promotionResult : PromotionResult(reward == null)
+    // 是未插入到数据库里面的数据
+    userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_USE_IN_TRADE_FROZEN.code, targetId != null)
+    pointAccountDO : PointAccountDO()
+    pointRecordDO : PointRecordDO()
+
+    then
+    promotionResult.setReward(true);
+
+    // 积分账户
+    pointAccountDO.setVersion(pointAccountDO.version + 1L);
+    pointAccountDO.setAvailableBalance((pointAccountDO.availableBalance == null ? 0 : pointAccountDO.availableBalance) - Long.valueOf(userInteractionRecordsDO.value));
+    pointAccountDO.setFrozenBalance((pointAccountDO.getFrozenBalance() == null ? 0L : pointAccountDO.getFrozenBalance())  +  Long.valueOf(userInteractionRecordsDO.value));
+    pointAccountDO.setLastUpdated(new Date());
+
+    // 积分纪录
+    pointRecordDO.setVersion(1L);
+    pointRecordDO.setAvailableBalance(pointAccountDO.getAvailableBalance());
+    pointRecordDO.setAmount((userInteractionRecordsDO.getValue() == null ? 0L : (Long.valueOf(userInteractionRecordsDO.getValue()))));
+    pointRecordDO.setType(PromotionType.POINT_USE_IN_TRADE_FROZEN.getCode());
+    pointRecordDO.setTradeId(Long.parseLong(userInteractionRecordsDO.getTargetId()));
+    pointRecordDO.setLastUpdated(new Date());
+    System.err.println("0004[E]-----冻结积分操作---------->point_use_in_trade.drl");
+    update(promotionResult);
+end
+
+
+rule "解冻冻结积分"
+salience 10
+    when
+
+    promotionResult : PromotionResult(reward == null)
+    // 是未插入到数据库里面的数据
+    userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_USE_IN_TRADE_FROZEN_ELIMINATE.code, targetId != null)
+    pointAccountDO : PointAccountDO(availableBalance != null)
+    pointRecordDO : PointRecordDO()
+    then
+
+    promotionResult.setReward(true);
+
+    // 积分账户
+    pointAccountDO.setVersion(pointAccountDO.version + 1L);
+    pointAccountDO.setFrozenBalance(pointAccountDO.getFrozenBalance() - userInteractionRecordsDO.value);
+    pointAccountDO.setLastUpdated(new Date());
+
+    // 积分纪录
+    pointRecordDO.setVersion(1L);
+    pointRecordDO.setAvailableBalance(pointAccountDO.getAvailableBalance());
+    pointRecordDO.setAmount(Long.valueOf(userInteractionRecordsDO.getValue()));
+    pointRecordDO.setType(PromotionType.POINT_USE_IN_TRADE_FROZEN_ELIMINATE.getCode());
+    pointRecordDO.setTradeId(Long.parseLong(userInteractionRecordsDO.getTargetId()));;
+    pointRecordDO.setLastUpdated(new Date());
+    System.err.println("0004[F]-----解冻冻结积分---------->point_use_in_trade.drl");
+    update(promotionResult);
+end
+
+rule "解冻冻结，变成为使用"
+salience 10
+    when
+
+    promotionResult : PromotionResult(reward == null)
+    // 是未插入到数据库里面的数据
+    userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_USE_IN_TRADE_FROZEN_RESTORE.code, targetId != null)
+    pointAccountDO : PointAccountDO(availableBalance != null)
+    pointRecordDO : PointRecordDO()
+    then
+
+    promotionResult.setReward(true);
+
+    // 积分账户
+    pointAccountDO.setVersion(pointAccountDO.version + 1L);
+    pointAccountDO.setAvailableBalance(pointAccountDO.getAvailableBalance() + userInteractionRecordsDO.value);
+    pointAccountDO.setFrozenBalance(pointAccountDO.getFrozenBalance() - userInteractionRecordsDO.value);
+    pointAccountDO.setLastUpdated(new Date());
+
+    // 积分纪录
+    pointRecordDO.setVersion(1L);
+    pointRecordDO.setAvailableBalance(pointAccountDO.getAvailableBalance());
+    pointRecordDO.setAmount(Long.valueOf(userInteractionRecordsDO.getValue()));
+    pointRecordDO.setType(PromotionType.POINT_USE_IN_TRADE_FROZEN_RESTORE.getCode());
+    pointRecordDO.setTradeId(Long.parseLong(userInteractionRecordsDO.getTargetId()));;
+    pointRecordDO.setLastUpdated(new Date());
+    System.err.println("0004[G]-----解冻冻结，变成为使用---------->point_use_in_trade.drl");
+    update(promotionResult);
+end
+
+
+//rule "004"
+//salience 3
+//lock-on-active
+	//when 
+	//	eval(true)
+	//then
+	//	System.err.println("第4分测试...");
+	//end
+	

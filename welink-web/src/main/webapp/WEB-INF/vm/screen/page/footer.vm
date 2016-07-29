@@ -1,0 +1,71 @@
+###if($!{isWx}=="1")
+##	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+##	<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+###end
+
+#if($!{host}=="h5.7nb.com.cn")
+<script type="text/javascript">
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+        #if($!{profileId})
+        ga('create', 'UA-58312531-1', { 'userId': '$!{userId}' });
+        #else
+        ga('create', 'UA-58312531-1', 'auto');
+        #end
+    ga('send', 'pageview');
+</script>
+#else
+##lgc 2015.11.10注释
+##<script type="text/javascript">
+##    var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+##    document.write(unescape("%3Cspan id='cnzz_stat_icon_1254909048'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "w.cnzz.com/q_stat.php%3Fid%3D1254909048' type='text/javascript'%3E%3C/script%3E"));
+##</script>
+<div style="display:none">
+##<script type="text/javascript">
+##	var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+##	document.write(
+##		unescape(
+##			"%3Cspan id='cnzz_stat_icon_1256001976'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1256001976' type='text/javascript'%3E%3C/script%3E"
+##		)
+##	);
+##</script>
+##	<script type="text/javascript">
+##		var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256897767'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "w.cnzz.com/q_stat.php%3Fid%3D1256897767%26l%3D3' type='text/javascript'%3E%3C/script%3E"));
+##	</script>
+	
+	<script type="text/javascript">
+		var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1256895643'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1256895643' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	
+</div>
+
+##if($!{host}=="h5.7nb.com.cn")
+##<script type="text/javascript">
+##    (function (i, s, o, g, r, a, m) {
+##        i['GoogleAnalyticsObject'] = r;
+##        i[r] = i[r] || function () {
+##            (i[r].q = i[r].q || []).push(arguments)
+##        }, i[r].l = 1 * new Date();
+##        a = s.createElement(o),
+##                m = s.getElementsByTagName(o)[0];
+##        a.async = 1;
+##        a.src = g;
+##        m.parentNode.insertBefore(a, m)
+##    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+##        #if($!{profileId})
+##        ga('create', 'UA-62316035-1', { 'userId': '$!{userId}' });
+##        #else
+##        ga('create', 'UA-62316035-1', 'auto');
+##        #end
+##    ga('send', 'pageview');
+##</script>
+#end

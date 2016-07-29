@@ -1,0 +1,59 @@
+package rules.promotions;
+dialect  "mvel"
+
+import com.welink.commons.domain.CouponDO
+import com.welink.commons.domain.UserCouponDO
+import com.welink.commons.domain.UserInteractionRecordsDO
+import com.welink.promotion.PromotionErrorEnum
+import com.welink.promotion.PromotionType
+import com.welink.promotion.CouponType
+import com.welink.promotion.reactive.PromotionResult
+import com.welink.promotion.drools.Utils
+import org.joda.time.DateTime
+import java.util.ArrayList
+import java.util.Date
+import java.util.Random;
+import java.math.BigDecimal
+import java.math.BigInteger
+
+// 通过摇一摇来获取优惠券
+// 一天只能够摇三次
+// 一天只能够中奖一次
+// 根据输入的随机，优惠券的概率不一样，判断顺序随机或者指定
+
+
+rule "邀请人领取优惠券"
+lock-on-active
+salience 10
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.COUPON_INVITE.code)
+        //(not UserInteractionRecordsDO(id != null, type == PromotionType.COUPON_INVITE.code))
+        userCouponDO : UserCouponDO()
+        couponDO : CouponDO(type == CouponType.INVITE.getCode())
+    then
+        promotionResult.setReward(true);
+        userCouponDO.setCouponId(couponDO.getId());
+        userCouponDO.setCouponType(couponDO.getType());
+        userCouponDO.setDateCreated(new Date());
+        userCouponDO.setLastUpdated(new Date());
+        userCouponDO.setPickTime(new Date());
+        userCouponDO.setStatus((byte) 1);
+        userCouponDO.setUserId(userInteractionRecordsDO.getUserId());
+        userCouponDO.setVersion(1L);
+        userCouponDO.setStartTime(new Date());
+        userCouponDO.setEndTime(new DateTime().plusDays(30).toDate());
+		System.err.println("0001[D]-----邀请人领取优惠券----------->coupon_acquire_shake.drl");
+        update(promotionResult);
+        update(userCouponDO);
+end
+
+
+//rule  "测试"
+//salience 2
+	//when
+  	//eval(true)
+  	//lock-on-active true
+  	//then
+  		//userCouponDo.setStartTime(new Date());
+

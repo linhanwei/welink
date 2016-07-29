@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+
+    <!-- <classPathEntry
+            location="/Users/daniel/.m2/repository/mysql/mysql-connector-java/5.1.32/mysql-connector-java-5.1.32.jar"/> -->
+
+
+    <context id="all" targetRuntime="MyBatis3">
+
+        <property name="suppressTypeWarnings" value="true"/>
+
+        <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"/>
+        <plugin type="com.welink.commons.mybaits.plugins.PaginationPlugin"/>
+        
+        <!-- <commentGenerator>
+			<property name="suppressDate" value="true" />
+			<property name="suppressAllComments" value="true" />
+	             是否生成注释代时间戳  
+	             <property name="suppressDate" value="true" />  
+	              
+		</commentGenerator> -->
+
+        <!--
+        <!<jdbcConnection driverClass="com.mysql.jdbc.Driver"-->
+        <!--connectionURL="jdbc:mysql://welinjia.mysql.rds.aliyuncs.com/linklife?useUnicode=true&amp;characterEncoding=utf8"-->
+        <!--userId="jusrguc9axdh"-->
+        <!--password="MASkin616510">-->
+        <!--</jdbcConnection>-->
+
+        <!-- <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://rdsqv472b2f2i81q2b11.mysql.rds.aliyuncs.com:3306/linklife?useUnicode=true&amp;characterEncoding=utf-8"
+                        userId="unes"
+                        password="8xW7wdWdhFe">
+        </jdbcConnection> -->
+        
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://rdsqv472b2f2i81q2b11o.mysql.rds.aliyuncs.com:3306/miku_test?useUnicode=true&amp;characterEncoding=utf-8"
+                        userId="unes"
+                        password="8xW7wdWdhFe">
+        </jdbcConnection>
+
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <javaModelGenerator targetPackage="com.welink.commons.domain"
+                            targetProject="${project.welink.commons.dir}/target">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <sqlMapGenerator targetPackage="com.welink.commons.persistence.mybatis"
+                         targetProject="${project.welink.commons.dir}/target">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.welink.commons.persistence"
+                             targetProject="${project.welink.commons.dir}/target">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+        <!-- <table tableName="miku_share_level" domainObjectName="MikuShareLevelDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        <table tableName="miku_user_agency" domainObjectName="MikuUserAgencyDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        <table tableName="miku_item_share_para" domainObjectName="MikuItemShareParaDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        <table tableName="miku_agency_level" domainObjectName="MikuAgencyLevelDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        <table tableName="miku_agency_share_account" domainObjectName="MikuAgencyShareAccountDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        <table tableName="miku_sales_record" domainObjectName="MikuSalesRecordDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        <table tableName="miku_share_getpay" domainObjectName="MikuShareGetpayDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        <table tableName="miku_getpay" domainObjectName="MikuGetpayDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>-->
+        
+        <!--<table tableName="miku_brand" domainObjectName="MikuBrandDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+       <table tableName="profile_temp" domainObjectName="ProfileTempDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_one_buy" domainObjectName="MikuOneBuyDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_user_one_buy" domainObjectName="MikuUserOneBuyDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_mobile_area" domainObjectName="MikuMobileAreaDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table> 
+        
+        <table tableName="miku_comments_count" domainObjectName="MikuCommentsCountDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_comments_reply" domainObjectName="MikuCommentsReplyDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_comments" domainObjectName="MikuCommentsDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_sensitive_words" domainObjectName="MikuSensitiveWordsDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_return_goods" domainObjectName="MikuReturnGoodsDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>	
+        
+        <table tableName="miku_wallet" domainObjectName="MikuWalletDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_wallet_origin" domainObjectName="MikuWalletOrigin">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_face_score_exchange" domainObjectName="MikuFaceScoreExchangeDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+         <table tableName="miku_crowdfund" domainObjectName="MikuCrowdfundDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_crowdfund_detail" domainObjectName="MikuCrowdfundDetailDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_wallet_origin" domainObjectName="MikuWalletOriginDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_crowdfund" domainObjectName="MikuCrowdfundDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_req_change_up_user" domainObjectName="MikuReqChangeUpUserDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_orders_logistics" domainObjectName="MikuOrdersLogisticsDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_scratch_card" domainObjectName="MikuScratchCardDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>	
+        
+        <table tableName="miku_activity_bonus" domainObjectName="MikuActivityBonusDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_active_topic" domainObjectName="MikuActiveTopicDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_topic_item" domainObjectName="MikuTopicItemDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_instrument_measure_log" domainObjectName="MikuInstrumentMeasureLogDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_csad" domainObjectName="MikuCsadDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_csad_evaluate" domainObjectName="MikuCsadEvaluateDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_csad_group" domainObjectName="MikuCsadGroupDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_csad_group_map" domainObjectName="MikuCsadGroupMapDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_mine_recentlycontact_log" domainObjectName="MikuMineRecentlycontactLogDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <table tableName="miku_csad_service_log" domainObjectName="MikuCsadServiceLogDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>-->
+        
+        <table tableName="miku_csad_clients" domainObjectName="MikuCsadClientsDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+        </table>
+        
+        <!-- <table tableName="search_item" domainObjectName="SearchItem">
+            <columnOverride column="id" property="id"/>
+            <columnOverride column="category_id" property="categoryId"/>
+            <columnOverride column="price" property="price"/>
+            <columnOverride column="promotion_price" property="promotionPrice"/>
+            <columnOverride column="title" property="title"/>
+            <columnOverride column="status" property="status"/>
+            <columnOverride column="online_start_time" property="onlineStartTime"/>
+            <columnOverride column="online_end_time" property="onlineEndTime"/>
+            <columnOverride column="sold_count" property="soldCount"/>
+            <columnOverride column="rank" property="rank"/>
+            <columnOverride column="type" property="type"/>
+            <columnOverride column="tag_id" property="tagId"/>
+            <columnOverride column="shop_id" property="shopId"/>
+            <columnOverride column="features" property="features"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+            <columnOverride column="item_date_created" property="itemDateCreated"/>
+            <columnOverride column="item_last_updated" property="itemLastUpdated"/>
+        </table>
+        
+        <table tableName="item" domainObjectName="Item">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+            <columnOverride column="version" property="version"/>
+            <columnOverride column="address" property="address"/>
+            <ignoreColumn column="allow_community_ids"/>
+            <columnOverride column="approve_status" property="approveStatus"/>
+            <columnOverride column="category_id" property="categoryId"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+            <ignoreColumn column="delivery_time"/>
+            <ignoreColumn column="delivery_time_type"/>
+            <columnOverride column="description" property="description"/>
+            <columnOverride column="features" property="features"/>
+            <ignoreColumn column="food_security"/>
+            <ignoreColumn column="forbidden_community_ids"/>
+            <ignoreColumn column="freight_payer"/>
+            <ignoreColumn column="has_discount"/>
+            <ignoreColumn column="has_invoice"/>
+            <columnOverride column="has_showcase" property="hasShowcase"/>
+            <ignoreColumn column="has_sku"/>
+            <ignoreColumn column="has_warranty"/>
+            <columnOverride column="increment" property="increment"/>
+            <ignoreColumn column="input_pids"/>
+            <ignoreColumn column="input_str"/>
+            <columnOverride column="pic_urls" property="picUrls"/>
+            <ignoreColumn column="item_size"/>
+            <ignoreColumn column="item_weight"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+            <ignoreColumn column="need_delivery_time"/>
+            <columnOverride column="num" property="num"/>
+            <columnOverride column="online_end_time" property="onlineEndTime"/>
+            <columnOverride column="online_start_time" property="onlineStartTime"/>
+            <ignoreColumn column="post_fee"/>
+            <columnOverride column="prop_imgs" property="prop_imgs"/>
+            <ignoreColumn column="props"/>
+            <ignoreColumn column="props_name"/>
+            <columnOverride column="sold_quantity" property="soldQuantity"/>
+            <ignoreColumn column="score"/>
+            <ignoreColumn column="second_kill"/>
+            <columnOverride column="seller_id" property="sellerId"/>
+            <columnOverride column="seller_type" property="sellerType"/>
+            <columnOverride column="shop_id" property="shopId"/>
+            <ignoreColumn column="skus"/>
+            <ignoreColumn column="stuff_status"/>
+            <columnOverride column="sub_stock" property="subStock"/>
+            <columnOverride column="type" property="type"/>
+            <columnOverride column="detail" property="detail"/>
+            <columnOverride column="video" property="video"/>
+            <ignoreColumn column="virtual"/>
+            <ignoreColumn column="with_hold_quantity"/>
+            <columnOverride column="base_item_id" property="baseItemId"/>
+            <columnOverride column="shop_type" property="shopType"/>
+        </table> -->
+        
+        <!--  <table tableName="profile_wechat" domainObjectName="ProfileWeChatDO">
+            <columnOverride column="id" property="id"/>
+            <columnOverride column="openid" property="openid"/>
+            <columnOverride column="nickname" property="nickname"/>
+            <columnOverride column="sex" property="sex"/>
+            <columnOverride column="province" property="province"/>
+            <columnOverride column="city" property="city"/>
+            <columnOverride column="country" property="country"/>
+            <columnOverride column="headimgurl" property="headimgurl"/>
+            <columnOverride column="privilege" property="privilege"/>
+            <columnOverride column="mobile" property="mobile"/>
+            <columnOverride column="version" property="version"/>
+            <columnOverride column="status" property="status"/>
+            <columnOverride column="synchron" property="synchron"/>
+            <columnOverride column="access_token" property="accessToken"/>
+            <columnOverride column="expires_in" property="expiresIn"/>
+            <columnOverride column="refresh_token" property="refreshToken"/>
+            <columnOverride column="scope" property="scope"/>
+            <columnOverride column="union_id" property="unionId"/>
+            <columnOverride column="subscribe_time" property="subscribeTime"/>
+            <columnOverride column="subscribe" property="subscribe"/>
+            <columnOverride column="language" property="language"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+            <columnOverride column="last_login_time" property="lastLoginTime"/>
+        </table> -->
+        
+        <!-- <table tableName="t_order" domainObjectName="Order">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+            <columnOverride column="trade_id" property="tradeId"/>
+            <columnOverride column="version" property="version"/>
+            <ignoreColumn column="item_meal_name"/>
+            <columnOverride column="pic_url" property="picUrl"/>
+            <columnOverride column="seller_id" property="sellerId"/>
+            <columnOverride column="seller_type" property="sellerType"/>
+            <columnOverride column="buyer_id" property="buyerId"/>
+            <columnOverride column="community_id" property="communityId"/>
+            <ignoreColumn column="refund_status"/>
+            <ignoreColumn column="outer_id"/>
+            <columnOverride column="snapshot_id" property="snapshotId"/>
+            <columnOverride column="snapshot" property="snapshot"/>
+            <columnOverride column="timeout_action_time" property="timeoutActionTime"/>
+            <columnOverride column="buyer_rate" property="buyerRate"/>
+            <ignoreColumn column="seller_rate"/>
+            <columnOverride column="category_id" property="categoryId"/>
+            <columnOverride column="status" property="status" jdbcType="TINYINT"/>
+            <columnOverride column="artificial_id" property="artificialId"/>
+            <columnOverride column="title" property="title"/>
+            <columnOverride column="price" property="price"/>
+            <ignoreColumn column="item_meal_id"/>
+            <ignoreColumn column="sku_id"/>
+            <columnOverride column="num" property="num"/>
+            <ignoreColumn column="outer_sku_id"/>
+            <columnOverride column="order_from" property="orderFrom"/>
+            <columnOverride column="total_fee" property="totalFee"/>
+            <columnOverride column="payment" property="payment"/>
+            <ignoreColumn column="discount_fee"/>
+            <ignoreColumn column="adjust_fee"/>
+            <ignoreColumn column="sku_properties_name"/>
+            <ignoreColumn column="refund_id"/>
+            <ignoreColumn column="is_oversold"/>
+            <columnOverride column="end_time" property="endTime"/>
+            <columnOverride column="consign_time" property="consignTime"/>
+            <columnOverride column="shipping_type" property="shippingType"/>
+            <ignoreColumn column="bind_oid"/>
+            <ignoreColumn column="logistics_company"/>
+            <ignoreColumn column="invoice_no"/>
+            <ignoreColumn column="store_code"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+        </table> 
+        
+         <table tableName="trade" domainObjectName="Trade">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+            <columnOverride column="version" property="version"/>
+            <columnOverride column="buyer_id" property="buyerId"/>
+            <columnOverride column="category_id" property="categoryId"/>
+            <columnOverride column="pic_url" property="picUrl"/>
+            <columnOverride column="payment" property="payment"/>
+            <columnOverride column="post_fee" property="postFee"/>
+            <columnOverride column="buyer_alipay_account" property="buyerAlipayAccount"/>
+            <columnOverride column="community_id" property="communityId"/>
+            <columnOverride column="building_id" property="buildingId"/>
+            <columnOverride column="seller_id" property="sellerId"/>
+            <columnOverride column="seller_type" property="sellerType"/>
+            <columnOverride column="seller_mobile" property="sellerMobile"/>
+            <columnOverride column="seller_phone" property="sellerPhone"/>
+            <columnOverride column="consign_time" property="consignTime"/>
+            <columnOverride column="confirm_time" property="confirmTime"/>
+            <ignoreColumn column="available_confirm_fee"/>
+            <ignoreColumn column="received_payment"/>
+            <columnOverride column="timeout_action_time" property="timeoutActionTime"/>
+            <columnOverride column="orders" property="orders"/>
+            <ignoreColumn column="promotion"/>
+            <ignoreColumn column="promotion_id"/>
+            <columnOverride column="num" property="num"/>
+            <columnOverride column="status" property="status"/>
+            <columnOverride column="title" property="title"/>
+            <columnOverride column="type" property="type"/>
+            <columnOverride column="price" property="price"/>
+            <ignoreColumn column="seller_cod_fee"/>
+            <columnOverride column="discount_fee" property="discountFee"/>
+            <columnOverride column="point_fee" property="pointFee"/>
+            <columnOverride column="has_post_fee" property="hasPostFee"/>
+            <columnOverride column="total_fee" property="totalFee"/>
+            <columnOverride column="pay_time" property="payTime"/>
+            <columnOverride column="end_time" property="endTime"/>
+            <columnOverride column="buyer_message" property="buyerMessage"/>
+            <columnOverride column="alipay_no" property="alipayNo"/>
+            <columnOverride column="alipay_url" property="alipayUrl"/>
+            <ignoreColumn column="buyer_memo"/>
+            <ignoreColumn column="invoice_name"/>
+            <ignoreColumn column="invoice_type"/>
+            <columnOverride column="has_buyer_message" property="hasBuyerMessage" jdbcType="BOOLEAN"/>
+            <ignoreColumn column="step_trade_status"/>
+            <ignoreColumn column="step_paid_fee"/>
+            <ignoreColumn column="mark_desc"/>
+            <ignoreColumn column="e_ticket_ext"/>
+            <ignoreColumn column="send_time"/>
+            <columnOverride column="shipping_type" property="shippingType"/>
+            <ignoreColumn column="buyer_cod_fee"/>
+            <ignoreColumn column="express_agency_fee"/>
+            <ignoreColumn column="adjust_fee"/>
+            <columnOverride column="cod_fee" property="codFee"/>
+            <columnOverride column="alipay_warn_msg" property="alipayWarnMsg"/>
+            <columnOverride column="cod_status" property="codStatus"/>
+            <columnOverride column="can_rate" property="canRate" jdbcType="BOOLEAN"/>
+            <columnOverride column="buyer_rate" property="buyerRate" jdbcType="BOOLEAN"/>
+            <columnOverride column="seller_rate" property="sellerRate" jdbcType="BOOLEAN"/>
+            <ignoreColumn column="value_added_orders"/>
+            <ignoreColumn column="trade_memo"/>
+            <ignoreColumn column="trade_source"/>
+            <ignoreColumn column="seller_can_rate"/>
+            <ignoreColumn column="real_point_fee"/>
+            <ignoreColumn column="arrive_interval"/>
+            <ignoreColumn column="arrive_cut_time"/>
+            <ignoreColumn column="consign_interval"/>
+            <columnOverride column="async_modified" property="asyncModified"/>
+            <columnOverride column="shop_id" property="shopId"/>
+            <ignoreColumn column="zero_purchase"/>
+            <columnOverride column="pay_type" property="payType"/>
+            <columnOverride column="courier" property="courier"/>
+            <columnOverride column="trade_from" property="tradeFrom"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+            <columnOverride column="consignee_id" property="consigneeId"/>
+            <columnOverride column="appoint_delivery_time" property="appointDeliveryTime"/>
+
+        </table> -->
+        
+       <!-- <table tableName="profile" domainObjectName="ProfileDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+            <columnOverride column="birthday"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+            <columnOverride column="identity_card" property="identityCard"/>
+            <columnOverride column="installed_app" property="installedApp"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+            <columnOverride column="lemon_name" property="lemonName"/>
+            <columnOverride column="mobile"/>
+            <columnOverride column="nickname"/>
+            <columnOverride column="password"/>
+            <columnOverride column="profile_pic" property="profilePic"/>
+            <columnOverride column="real_name" property="realName"/>
+            <columnOverride column="last_community" property="lastCommunity"/>
+            <columnOverride column="last_login_building" property="lastLoginBuilding"/>
+            <columnOverride column="status"/>
+            <columnOverride column="diploma" property="diploma"/>
+            <columnOverride column="type" property="type"/>
+        </table> -->
+        
+        <!-- <table tableName="search_item" domainObjectName="SearchItem">
+            <columnOverride column="id" property="id"/>
+            <columnOverride column="category_id" property="categoryId"/>
+            <columnOverride column="price" property="price"/>
+            <columnOverride column="promotion_price" property="promotionPrice"/>
+            <columnOverride column="title" property="title"/>
+            <columnOverride column="status" property="status"/>
+            <columnOverride column="online_start_time" property="onlineStartTime"/>
+            <columnOverride column="online_end_time" property="onlineEndTime"/>
+            <columnOverride column="sold_count" property="soldCount"/>
+            <columnOverride column="rank" property="rank"/>
+            <columnOverride column="type" property="type"/>
+            <columnOverride column="tag_id" property="tagId"/>
+            <columnOverride column="shop_id" property="shopId"/>
+            <columnOverride column="features" property="features"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+            <columnOverride column="item_date_created" property="itemDateCreated"/>
+            <columnOverride column="item_last_updated" property="itemLastUpdated"/>
+        </table>
+        
+        <table tableName="banner" domainObjectName="BannerDO">
+            <columnOverride column="id" property="id"/>
+            <columnOverride column="version" property="version"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+            <columnOverride column="description" property="description"/>
+            <columnOverride column="online_end_time" property="onlineEndTime"/>
+            <columnOverride column="online_start_time" property="onlineStartTime"/>
+            <columnOverride column="pic_url" property="picUrl"/>
+            <columnOverride column="redirect_type" property="redirectType"/>
+            <columnOverride column="show_status" property="showStatus"/>
+            <columnOverride column="status" property="status"/>
+            <columnOverride column="target" property="target"/>
+            <columnOverride column="title" property="title"/>
+            <columnOverride column="type" property="type"/>
+            <columnOverride column="weight" property="weight"/>
+            <columnOverride column="community_id" property="communityId"/>
+        </table>
+        
+        <table tableName="object_tagged" domainObjectName="ObjectTaggedDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+            <columnOverride column="version" property="version"/>
+            <columnOverride column="artificial_id" property="artificialId"/>
+            <columnOverride column="type" property="type"/>
+            <columnOverride column="status" property="status"/>
+            <columnOverride column="start_time" property="startTime"/>
+            <columnOverride column="end_time" property="endTime"/>
+            <columnOverride column="tag_id" property="tagId"/>
+            <columnOverride column="kv" property="kv"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+        </table>
+        
+        <table tableName="coupon" domainObjectName="CouponDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+            <columnOverride column="shop_id" property="shopId"/>
+            <columnOverride column="start_time" property="startTime"/>
+            <columnOverride column="end_time" property="endTime"/>
+            <columnOverride column="name" property="name"/>
+            <columnOverride column="description" property="description"/>
+            <columnOverride column="pic_url" property="picUrl"/>
+            <columnOverride column="value" property="value"/>
+            <columnOverride column="type" property="type"/>
+            <columnOverride column="status" property="status"/>
+            <columnOverride column="min_value" property="minValue"/>
+            <columnOverride column="probability" property="probability"/>
+            <columnOverride column="limit_num" property="limitNum"/>
+            <columnOverride column="attributes" property="attributes"/>
+            <columnOverride column="version" property="version"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+        </table>
+        
+        <table tableName="logistics" domainObjectName="LogisticsDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+            <columnOverride column="user_id" property="userId"/>
+            <columnOverride column="longitude" property="longitude"/>
+            <columnOverride column="latitude" property="latitude"/>
+            <columnOverride column="contact_name" property="contactName"/>
+            <columnOverride column="province" property="province"/>
+            <columnOverride column="city" property="city"/>
+            <columnOverride column="country" property="country"/>
+            <columnOverride column="addr" property="addr"/>
+            <columnOverride column="zip_code" property="zipCode"/>
+            <columnOverride column="phone" property="phone"/>
+            <columnOverride column="mobile" property="mobile"/>
+            <columnOverride column="seller_company" property="sellerCompany"/>
+            <columnOverride column="memo" property="memo"/>
+            <columnOverride column="get_def" property="getDef"/>
+            <columnOverride column="cancel_def" property="cancelDef"/>
+            <columnOverride column="community_id" property="community_id"/>
+            <columnOverride column="district_id" property="districtId"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+            <columnOverride column="user_id" property="userId"/>
+            <columnOverride column="consignee_id" property="consigneeId"/>
+        </table>
+        
+        <table tableName="consignee_addr" domainObjectName="ConsigneeAddrDO">
+            <generatedKey column="id" sqlStatement="mysql" identity="true"/>
+            <columnOverride column="user_id" property="userId"/>
+            <columnOverride column="receiver_name" property="receiverName"/>
+            <columnOverride column="receiver_phone" property="receiverPhone"/>
+            <columnOverride column="receiver_mobile" property="receiverMobile"/>
+            <columnOverride column="receiver_state" property="receiver_state"/>
+            <columnOverride column="receiver_city" property="receiverCity"/>
+            <columnOverride column="receiver_district" property="receiverDistrict"/>
+            <columnOverride column="receiver_address" property="receiverAddress"/>
+            <columnOverride column="receiver_zip" property="receiverZip"/>
+            <columnOverride column="community_id" property="communityId"/>
+            <columnOverride column="community" property="community"/>
+            <columnOverride column="get_def" property="getDef"/>
+            <columnOverride column="cancel_def" property="cancelDef"/>
+            <columnOverride column="longitude" property="longitude"/>
+            <columnOverride column="latitude" property="latitude"/>
+            <columnOverride column="community_name" property="communityName"/>
+            <columnOverride column="uid" property="uid"/>
+            <columnOverride column="province_code" property="provinceCode"/>
+            <columnOverride column="city_code" property="cityCode"/>
+            <columnOverride column="add_code" property="addCode"/>
+            <columnOverride column="latitude" property="latitude"/>
+            <columnOverride column="date_created" property="dateCreated"/>
+            <columnOverride column="last_updated" property="lastUpdated"/>
+            <columnOverride column="type" property="type"/>
+            <columnOverride column="modifi_addr" property="modifiAddr"/>
+            <columnOverride column="status" property="status"/>
+        </table> -->
+        
+        
+
+    </context>
+</generatorConfiguration>

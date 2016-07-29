@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>绑定手机永久免登</title>
+    #parse("head.vm")
+    <link rel="stylesheet" href="http://$!{host}/h5/css/page/bindMobile.css?v=$!{ver}"/>
+</head>
+<body>
+<section class="page slide" id="bindMobilePage">
+    <div class="page-content fade">
+        <div class="page-scroll-panel bind-mobile-form form-items" data-role-scrollable="true">
+            <h1 class="title">验证手机即刻成为米酷用户！</h1>
+
+            <div class="grid layout">
+                <div class="row">
+                    <label class="col col-4 tr pr-5">+86</label>
+                    <input class="col col-21 mobile focus pl-5" type="tel" placeholder="请输入您的11位手机号码" maxlength="11"/>
+                </div>
+                <div class="row">
+                    <input class="ol col-15 vercode tc" type="tel" placeholder="请输入收到的4位验证码" maxlength="4"/>
+
+                    <div class="col col-10">
+                        <div class="button sendvercode">发送验证码</div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="button submit">绑定</div>
+            </div>
+        </div>
+    </div>
+    <div class="page-mask"></div>
+</section>
+    #parse("appbar.vm")
+<script src="http://$!{host}/h5/js/lib/main.js?v=$!{ver}"></script>
+<script>
+    require('h5/js/page/bindMobile', function (page) {
+        page.show();
+    });
+</script>
+    #parse("footer.vm")
+</body>
+</html>

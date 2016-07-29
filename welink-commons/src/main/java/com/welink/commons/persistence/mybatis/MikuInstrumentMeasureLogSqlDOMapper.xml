@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.welink.commons.persistence.MikuInstrumentMeasureLogDOMapper" >
+  <resultMap id="MikuOperMeaureDataMap" type="com.welink.commons.domain.MikuOperMeaureData" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="timetype" property="timetype" jdbcType="VARCHAR" />
+    <result column="test_position" property="testPosition" jdbcType="TINYINT" />
+    <result column="measure_value" property="measureValue" jdbcType="DECIMAL" />
+    <result column="moisture_value" property="moistureValue" jdbcType="DECIMAL" />
+    <result column="oil_value" property="oilValue" jdbcType="DECIMAL" />
+    <result column="resilience_value" property="resilienceValue" jdbcType="DECIMAL" />
+    <result column="senility_value" property="senilityValue" jdbcType="DECIMAL" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+  </resultMap>
+  
+  
+  <select id="selectByMonthParamsByAvg" resultMap="MikuOperMeaureDataMap" parameterType="java.util.Map">
+       SELECT 
+    	CAST(AVG(measure_value) AS DECIMAL(5,1)) as  measure_value,
+    	CAST(AVG(moisture_value) AS DECIMAL(5,1)) as  moisture_value,
+    	CAST(AVG(oil_value) AS DECIMAL(5,1)) as  oil_value,
+    	CAST(AVG(resilience_value) AS DECIMAL(5,1))  as  resilience_value,
+    	CAST(AVG(senility_value) AS DECIMAL(5,1)) as  senility_value,
+    	test_position
+       FROM miku_instrument_measure_log 
+       where create_year=#{year} and create_month=#{month} and user_id=#{id}
+       group by test_position
+  </select>
+  
+  
+  
+   <select id="selectByDayParamsByAvg" resultMap="MikuOperMeaureDataMap" parameterType="java.util.Map">
+    SELECT 
+    	CAST(AVG(measure_value) AS DECIMAL(5,1)) as  measure_value,
+    	CAST(AVG(moisture_value) AS DECIMAL(5,1)) as  moisture_value,
+    	CAST(AVG(oil_value) AS DECIMAL(5,1)) as  oil_value,
+    	CAST(AVG(resilience_value) AS DECIMAL(5,1))  as  resilience_value,
+    	CAST(AVG(senility_value) AS DECIMAL(5,1)) as  senility_value,
+    	test_position
+       FROM miku_instrument_measure_log
+       where create_year=#{year} and create_month=#{month} and create_day=#{day} and user_id=#{id}
+       group by test_position
+  </select>
+  
+  
+  
+  <select id="selectByHourParamsByAvg" resultMap="MikuOperMeaureDataMap" parameterType="java.util.Map">
+    SELECT 
+    	CAST(AVG(measure_value) AS DECIMAL(5,1)) as  measure_value,
+    	CAST(AVG(moisture_value) AS DECIMAL(5,1)) as  moisture_value,
+    	CAST(AVG(oil_value) AS DECIMAL(5,1)) as  oil_value,
+    	CAST(AVG(resilience_value) AS DECIMAL(5,1))  as  resilience_value,
+    	CAST(AVG(senility_value) AS DECIMAL(5,1)) as  senility_value,
+    	test_position,create_hour as timetype
+        FROM miku_instrument_measure_log
+        where create_year=#{year} and create_month=#{month} and create_day=#{day} and user_id=#{id}
+        group by test_position,create_hour
+  </select>
+  
+  
+  
+  <select id="selectByOneDayForList" resultMap="BaseResultMap" parameterType="java.util.Map">
+  	SELECT 
+  		id, version, create_day, create_month, create_hour, create_week, create_year, date_created, 
+	    instrument_type, last_updated, measure_type, measure_value, moisture_value, oil_value, 
+	    resilience_value, senility_value, user_id, test_position
+  		FROM miku_instrument_measure_log
+       where create_year=#{year} and create_month=#{month} and create_day=#{day} and user_id=#{id}
+  </select>
+  
+  
+  
+  <select id="selectByOneMonthForList" resultMap="BaseResultMap" parameterType="java.util.Map">
+  	SELECT 
+  		id, version, create_day, create_month, create_hour, create_week, create_year, date_created, 
+	    instrument_type, last_updated, measure_type, measure_value, moisture_value, oil_value, 
+	    resilience_value, senility_value, user_id, test_position
+  		FROM miku_instrument_measure_log
+       where create_year=#{year} and create_month=#{month} and user_id=#{id}
+  </select>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+</mapper>

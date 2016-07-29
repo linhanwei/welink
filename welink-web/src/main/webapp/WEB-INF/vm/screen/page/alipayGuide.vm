@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>米酷</title>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="cleartype" content="on">
+    <meta name="viewport"
+          content="width=device-width, minimum-scale=1.0, maximum-scale=1.0,initial-scale=1, user-scalable=no">
+    <meta name="editor" content="superman">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            background: #f9e8ca;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+            margin: 30px auto 0;
+        }
+    </style>
+</head>
+<body>
+<img src="http://welinklife.b0.upaiyun.com/1/LTE=/SVRFTS1QVUJMSVNI/MA==/20150406/vNTT-0-1428324374383.png"/>
+</body>
+</html>

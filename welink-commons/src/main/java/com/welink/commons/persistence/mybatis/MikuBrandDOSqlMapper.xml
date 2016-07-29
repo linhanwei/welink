@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.welink.commons.persistence.MikuBrandDOMapper" >
+  <select id="getBrandsByCates"  resultMap="BaseResultMap" parameterType="java.util.Map" >
+    <!--
+      	根据商品里的分类id等条件查询品牌
+    -->
+    select
+    	mb.id, mb.name, mb.full_name, mb.company, mb.picture, mb.market, mb.is_deleted, mb.weight
+	from miku_brand mb
+		LEFT JOIN (select brand_id from item  
+					<where>
+						type = 1 and approve_status = 1
+						<if test="cateLevel != null and cateLevel > 0" >
+							<choose>
+								<when test="cateLevel == 1 and categoryId != null and categoryId > 0">
+									and category1_id = #{categoryId,jdbcType=BIGINT}
+								</when>
+								<when test="cateLevel == 2 and categoryId != null and categoryId > 0">
+									and category2_id = #{categoryId,jdbcType=BIGINT}
+								</when>
+								<when test="cateLevel == 3 and categoryId != null and categoryId > 0">
+									and category_id = #{categoryId,jdbcType=BIGINT}
+								</when>
+							</choose>
+						</if>
+					</where>
+					GROUP BY brand_id
+				  ) a
+			on mb.id = a.brand_id
+	where a.brand_id is not null and mb.is_deleted = 0
+	ORDER BY weight asc
+  </select>
+  
+  <select id="getCatesByBrands"  resultMap="com.welink.commons.persistence.CategoryDOMapper.BaseResultMap" parameterType="java.util.Map" >
+  	<!--
+      	根据商品里的品牌id等条件查询分类
+    -->
+  	select 
+  		c.id, version, c.is_parent, c.name,
+        c.picture, c.status, c.weight, c.parent_id, c.level
+	from (
+			select 
+			<choose>
+				<when test="cateLevel != null and cateLevel == 1 and cateLevel > 0">
+					category1_id as category_id 
+				</when>
+				<when test="cateLevel != null and cateLevel == 2 and cateLevel > 0">
+					category2_id as category_id 
+				</when>
+				<when test="cateLevel != null and cateLevel == 3 and cateLevel > 0">
+					category_id as category_id 
+				</when>
+				<otherwise>
+					category2_id as category_id 
+				</otherwise>
+			</choose>
+			from item 
+				where type = 1 and approve_status = 1
+				<if test="brandId != null and brandId > 0" >
+					and brand_id = #{brandId,jdbcType=BIGINT}
+				</if>
+				GROUP BY category_id
+		) it LEFT JOIN category c on c.id = it.category_id
+	where it.category_id is NOT null and c.id is not null and c.status = 1
+	<if test="cateParentId != null and cateParentId > 0" >
+		and c.parent_id = #{cateParentId,jdbcType=BIGINT}
+	</if>
+  </select>
+  
+</mapper>

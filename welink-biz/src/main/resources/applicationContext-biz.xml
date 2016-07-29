@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <import resource="classpath:buy-applicationContext.xml"/>
+    <import resource="classpath:biz-service.xml"/>
+    <import resource="classpath:biz-source.xml"/>
+    <import resource="biz-memcached.xml"/>
+
+    <context:annotation-config/>
+    <context:component-scan base-package="com.welink.biz"/>
+
+    <bean id="checkNOGenerator" class="com.welink.biz.common.cache.CheckNOGenerator"/>
+
+    <bean id="FirstInstallModel" class="com.welink.biz.common.model.FirstInstallModel" scope="singleton"/>
+
+    <bean id="keyPairUtils" name="keyPairUtils" class="com.welink.biz.common.security.KeyPairUtils">
+    </bean>
+
+    <bean id="tradeCheckerTask" name="tradeCheckerTask" class="com.welink.biz.resources.TradeCheckerTask">
+    </bean>
+    
+    <bean id="crowdfundTask" name="crowdfundTask" class="com.welink.biz.common.task.CrowdfundTask">
+    </bean>
+
+    <!-- timer -->
+    <bean id="jobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.welink.biz.resources.TradeCheckerTask"></property>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="jobDetail1" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.welink.biz.common.task.ItemStatusTask"></property>
+        <property name="durability" value="true"/>
+    </bean>
+
+    <bean id="jobDetail2" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.welink.biz.common.task.ItemStatusWtTask"></property>
+        <property name="durability" value="true"/>
+    </bean>
+    
+    <bean id="jobDetail_profit" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.welink.biz.common.task.ProfitTask"></property>
+        <property name="durability" value="true"/>
+    </bean>
+    
+    <!-- 众筹 -->
+    <bean id="jobDetail_crowdfund" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.welink.biz.common.task.CrowdfundTask"></property>
+        <property name="durability" value="true"/>
+    </bean>
+     <!-- 众筹 -->
+    <bean id="cronTriggerBean_crowdfund" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="jobDetail_crowdfund"></property>
+        <property name="cronExpression" value="0 0/5 * * * ?"></property>
+    </bean>
+
+    <bean id="cronTriggerBean" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="jobDetail"></property>
+        <property name="cronExpression" value="0 0/5 * * * ?"></property>
+    </bean>
+
+    <bean id="cronTriggerBean1" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="jobDetail1"></property>
+        <property name="cronExpression" value="1 0 0 * * ? *"></property>
+    </bean>
+
+    <bean id="cronTriggerBean2" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="jobDetail2"></property>
+        <property name="cronExpression" value="59 59 23 * * ? *"></property>
+    </bean>
+    
+    <!-- 分润 -->
+    <bean id="cronTriggerBean_profit" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="jobDetail_profit"></property>
+        <property name="cronExpression" value="0 0 2 * * ? *"></property>
+        <!-- <property name="cronExpression" value="0 0/4 19 * * ?"></property> -->
+         <!-- <property name="cronExpression" value="0 0/8 * * * ?"></property> -->
+        <!-- <property name="cronExpression" value="0 0/10 10,11,12,13,14,15,16,17,18 * * ?"></property> -->
+    </bean>
+    
+    <bean id="trigger" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="cronTriggerBean"/>
+                <ref bean="cronTriggerBean1"/>
+                <ref bean="cronTriggerBean2"/>
+                <ref bean="cronTriggerBean_crowdfund"/>
+                <ref bean="cronTriggerBean_profit"/>
+            </list>
+        </property>
+        <property name="schedulerContextAsMap">
+            <map>
+                <!-- spring 管理的service需要放到这里，才能够注入成功 -->
+                <description>schedulerContextAsMap</description>
+                <entry key="objectTaggedDOMapper" value-ref="objectTaggedDOMapper"/>
+                <entry key="tagsDOMapper" value-ref="tagsDOMapper"/>
+                <entry key="tradeCourierDOMapper" value-ref="tradeCourierDOMapper"/>
+                <entry key="tradeMapper" value-ref="tradeMapper"/>
+                <entry key="pushService" value-ref="pushService"/>
+                <entry key="orderMapper" value-ref="orderMapper"/>
+                <entry key="evalService" value-ref="evalService"/>
+                <entry key="itemMapper" value-ref="itemMapper"/>
+                <entry key="grouponDOMapper" value-ref="grouponDOMapper"/>
+                <entry key="transactionManager" value-ref="transactionManager"/>
+                <entry key="alipayBackSpareDOMapper" value-ref="alipayBackSpareDOMapper"/>
+                <entry key="memcachedClient" value-ref="memcachedClient"/>
+                <entry key="transactionManager" value-ref="transactionManager"/>
+                <entry key="itemService" value-ref="itemService"/>
+                <entry key="bannerService" value-ref="bannerService"/>
+                <entry key="usePromotionService" value-ref="usePromotionService"/>
+                <entry key="asyncEventBus" value-ref="asyncEventBus"/>
+                <entry key="tradeService" value-ref="tradeService"/>
+                <entry key="profitService" value-ref="profitService"/>
+                <entry key="mikuCrowdfundDOMapper" value-ref="mikuCrowdfundDOMapper"/>
+                <entry key="mikuCrowdfundDetailDOMapper" value-ref="mikuCrowdfundDetailDOMapper"/>
+                <entry key="mikuSalesRecordDOMapper" value-ref="mikuSalesRecordDOMapper"/>
+            </map>
+        </property>
+    </bean>
+</beans>

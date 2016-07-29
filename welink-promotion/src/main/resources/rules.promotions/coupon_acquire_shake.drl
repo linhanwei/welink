@@ -1,0 +1,145 @@
+package rules.promotions;
+dialect  "mvel"
+
+import com.welink.commons.domain.CouponDO
+import com.welink.commons.domain.UserCouponDO
+import com.welink.commons.domain.UserInteractionRecordsDO
+import com.welink.promotion.PromotionErrorEnum
+import com.welink.promotion.PromotionType
+import com.welink.promotion.CouponType
+import com.welink.promotion.reactive.PromotionResult
+import com.welink.promotion.drools.Utils
+import org.joda.time.DateTime
+import java.util.ArrayList
+import java.util.Date
+import java.util.Random;
+import java.math.BigDecimal
+import java.math.BigInteger
+
+// 通过摇一摇来获取优惠券
+// 一天只能够摇三次
+// 一天只能够中奖一次
+// 根据输入的随机，优惠券的概率不一样，判断顺序随机或者指定
+
+// validation
+rule "摇一摇，每天只能摇三次"
+salience 100
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        ArrayList(size() >= 3 ) from collect (
+            UserInteractionRecordsDO(id != null, type == PromotionType.COUPON_SHAKE.code, Utils.isToday(dateCreated))
+        )
+    then
+        promotionResult.reward = false;
+        promotionResult.code = PromotionErrorEnum.COUPON_SHAKE_LIMITED.getCode();
+        promotionResult.message = PromotionErrorEnum.COUPON_SHAKE_LIMITED.getMsg();
+
+
+        update(promotionResult);
+end
+
+rule "一天只能够中一次奖"
+salience 100
+lock-on-active
+    when
+        promotionResult : PromotionResult(reward == null)
+        UserInteractionRecordsDO(id != null, type == PromotionType.COUPON_SHAKE.code, Utils.isToday(dateCreated), destination != null)
+
+    then
+        promotionResult.reward = false;
+        promotionResult.code = PromotionErrorEnum.COUPON_BINGO_LIMITED.getCode();
+        promotionResult.message = PromotionErrorEnum.COUPON_BINGO_LIMITED.getMsg();
+
+        update(promotionResult);
+end
+
+
+rule "判断是否领取新人优惠券，已经领取返回错误"
+lock-on-active
+salience 100
+    when
+        promotionResult : PromotionResult(reward == null)
+        ArrayList(size() >= 300 ) from collect (
+            UserInteractionRecordsDO(id != null, type == PromotionType.COUPON_NEW_USER.code)
+        )
+    then
+        promotionResult.setReward(false);
+        promotionResult.setCode(PromotionErrorEnum.COUPON_ROOKIE_PRESENT_ALREADY_RECEIVED.getCode());
+        promotionResult.setMessage(PromotionErrorEnum.COUPON_ROOKIE_PRESENT_ALREADY_RECEIVED.getMsg());
+
+        update(promotionResult);
+end
+
+rule "领取新人优惠券"
+lock-on-active
+salience 10
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.COUPON_NEW_USER.code)
+        (not UserInteractionRecordsDO(id != null, type == PromotionType.COUPON_NEW_USER.code)
+        or
+        ArrayList(size() < 300 ) from collect (
+                    UserInteractionRecordsDO(id != null, type == PromotionType.COUPON_NEW_USER.code)
+        ))
+        userCouponDO : UserCouponDO()
+        couponDO : CouponDO(type == CouponType.ROOKIE.getCode())
+    then
+        promotionResult.setReward(true);
+        userCouponDO.setCouponId(couponDO.getId());
+        userCouponDO.setCouponType(couponDO.getType());
+        userCouponDO.setDateCreated(new Date());
+        userCouponDO.setLastUpdated(new Date());
+        userCouponDO.setPickTime(new Date());
+        userCouponDO.setStatus((byte) 1);
+        userCouponDO.setUserId(userInteractionRecordsDO.getUserId());
+        userCouponDO.setVersion(1L);
+
+        update(promotionResult);
+        update(userCouponDO);
+end
+
+
+
+rule "判断输入的优惠券，是否能够中奖"
+lock-on-active
+salience 10
+    when
+        promotionResult : PromotionResult(reward == null)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.COUPON_SHAKE.code, Utils.isToday(dateCreated))
+        userCouponDO : UserCouponDO()
+        couponDO : CouponDO($p : probability != null && Utils.lucky($p), type == CouponType.OFF_FOR_CONDITION.getCode())
+    then
+        promotionResult.setReward(true);
+        userCouponDO.setCouponId(couponDO.getId());
+        userCouponDO.setCouponType(couponDO.getType());
+        userCouponDO.setDateCreated(new Date());
+        userCouponDO.setLastUpdated(new Date());
+        userCouponDO.setPickTime(new Date());
+        userCouponDO.setStatus((byte) 1);
+        userCouponDO.setUserId(userInteractionRecordsDO.getUserId());
+        userCouponDO.setVersion(1L);
+
+        update(promotionResult);
+        update(userCouponDO);
+end
+
+// 如果能够中奖，根据优惠券type，来设定不同的优惠规则
+
+rule "如果摇一摇中优惠券，设置中奖后的优惠券规则"
+salience 1
+    when
+        promotionResult : PromotionResult(reward == true)
+        UserInteractionRecordsDO(type in (PromotionType.COUPON_SHAKE.code, PromotionType.COUPON_NEW_USER.code))
+        userCouponDO : UserCouponDO(couponType in (CouponType.OFF_FOR_CONDITION.getCode(), CouponType.ROOKIE.getCode(), id == null))
+        couponDO : CouponDO()
+    then
+        userCouponDO.setStartTime(new Date());
+        if(null != couponDO && null != couponDO.getValidity() && couponDO.getValidity() > 0){
+	        userCouponDO.setEndTime(new DateTime().plusDays(couponDO.getValidity()).toDate());
+        }else{
+        	userCouponDO.setEndTime(new DateTime().plusDays(30).toDate());
+        }
+
+end
+

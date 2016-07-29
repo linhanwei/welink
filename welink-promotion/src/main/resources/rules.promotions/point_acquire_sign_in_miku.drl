@@ -1,0 +1,95 @@
+package rules.promotions;
+dialect  "mvel"
+
+import com.welink.commons.domain.UserInteractionRecordsDO
+import com.welink.promotion.PromotionType
+import com.welink.promotion.reactive.PromotionResult
+import com.welink.commons.domain.PointRecordDO
+import com.welink.commons.domain.PointAccountDO
+import com.welink.promotion.drools.Utils
+import com.welink.commons.domain.Item
+import com.welink.commons.domain.Order
+
+import java.util.Date
+import java.util.List
+import org.joda.time.DateTime
+import org.apache.commons.lang3.builder.ToStringBuilder
+import com.welink.promotion.PromotionErrorEnum
+
+// validation
+// 插入两个UserInteractionRecordsDO，其中一个是没有插入的，一个是数据库最新的
+// 首先判断这次交互是不是有效交互，如果都是有效交互，调整用户积分
+
+rule "邀请人领积分"
+    salience 10
+    lock-on-active
+    when
+        //not UserInteractionRecordsDO(id != null, type == PromotionType.POINT_INVITE.code)
+        userInteractionRecordsDO : UserInteractionRecordsDO(id == null, type == PromotionType.POINT_INVITE.code)
+        promotionResult : PromotionResult(reward == null)
+        pointAccountDO : PointAccountDO()
+        pointRecordDO : PointRecordDO()
+    then
+        promotionResult.setReward(true);
+        // 交互
+        userInteractionRecordsDO.setValue(1);
+
+        // 积分账户
+        pointAccountDO.setVersion(pointAccountDO.version == null ? 2L : (pointAccountDO.version + 1L));
+        pointAccountDO.setAvailableBalance(pointAccountDO.availableBalance == null ? 0L + 500L : pointAccountDO.availableBalance + 500L);
+        pointAccountDO.setLastUpdated(new Date());
+
+        // 积分纪录
+        pointRecordDO.setVersion(1L);
+        pointRecordDO.setAvailableBalance(pointAccountDO.getAvailableBalance());
+        pointRecordDO.setAmount(500L);
+        pointRecordDO.setType(PromotionType.POINT_INVITE.getCode());
+        pointRecordDO.setLastUpdated(new Date());
+		System.err.println("0003[H]-----邀请人领积分---------->point_acquire_sign_in_miku.drl");
+        update(promotionResult);
+
+end
+
+
+rule "赠品操作"
+salience 3
+   lock-on-active
+   when
+       order:Order(id==null)
+       promotionResult:PromotionResult(reward == null,code==0)
+       userInteractionRecordsDO:UserInteractionRecordsDO(type==null)
+   then
+       
+        //订单表操作
+        //order.setTitle("赠品");
+         order.setDateCreated(new Date());
+         order.setTotalFee(0L);
+        //商品的id
+         order.setArtificialId(8414L);
+         order.setIsActivity((byte)1);
+         order.setVersion(1L);
+		 order.setCommunityId(2043L);
+		 order.setLastUpdated(new Date());
+		 order.setNum(1);
+		 order.setSellerId(999L);
+		 order.setSellerType((byte)1);
+		 order.setItemCostFee(0L);
+		 order.setItemProfitFee(0L);
+		 order.setItemShareFee(0L);
+		 order.setStatus((byte)3);
+         
+      
+        //互动表信息
+        userInteractionRecordsDO.setType(PromotionType.ITEM_ENOUGY_NUM_STATUS.getCode());
+        userInteractionRecordsDO.setDateCreated(new Date());
+        //userInteractionRecordsDO.setDestination("赠品");
+        userInteractionRecordsDO.setVersion(1L);
+          userInteractionRecordsDO.setLastUpdated(new Date());
+        System.err.println("0004[H]-----give Priencent---------->point_use_in_trade.drl");
+       
+        promotionResult.setReward(true);
+
+         update(promotionResult);
+     end
+
+

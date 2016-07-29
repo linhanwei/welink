@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:commons-mybatis-config.xml"/>
+        <property name="mapperLocations" value="classpath*:com/welink/commons/persistence/mybatis/*Mapper.xml"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="plugins">
+            <array>
+                <bean class="com.welink.commons.mybaits.plugins.ItemUpdateMapperInterceptor">
+                    <property name="asyncEventBus" ref="asyncEventBus"/>
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
+        <property name="slowSqlMillis" value="1000"/>
+        <property name="logSlowSql" value="true"/>
+        <property name="mergeSql" value="true"/>
+    </bean>
+
+    <bean id="abstractDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close"
+          init-method="init" abstract="true">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="filters" value="slf4j"/>
+        <property name="proxyFilters">
+            <list>
+                <ref bean="stat-filter"/>
+            </list>
+        </property>
+        <property name="maxActive" value="20"/>
+        <property name="initialSize" value="1"/>
+        <property name="maxWait" value="60000"/>
+        <property name="minIdle" value="1"/>
+        <property name="timeBetweenEvictionRunsMillis" value="3000"/>
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="poolPreparedStatements" value="false"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
+    </bean>
+
+    <!-- <beans profile="dev">
+        <bean id="dataSource" parent="abstractDataSource">
+            <property name="url"
+                      value="jdbc:mysql://unescn00.mysql.rds.aliyuncs.com/linklife?useUnicode=true&amp;characterEncoding=utf8"/>
+            <property name="username" value="welinklife"/>
+            <property name="password" value="Immysql123456"/>
+        </bean>
+    </beans> -->
+    
+    <!-- <beans profile="dev">
+        <bean id="dataSource" parent="abstractDataSource">
+            <property name="url"
+                      value="jdbc:mysql://127.0.0.1:3306/linklife?useUnicode=true&amp;characterEncoding=utf-8"/>
+            <property name="username" value="root"/>
+            <property name="password" value="123456"/>
+        </bean>
+    </beans> -->
+    
+    <!-- <beans profile="dev">
+        <bean id="dataSource" parent="abstractDataSource">
+            <property name="url"
+                      value="jdbc:mysql://120.24.102.187:4407/linklife?useUnicode=true&amp;characterEncoding=utf-8"/>
+            <property name="username" value="unes"/>
+            <property name="password" value="8xW7wdWdhFe"/>
+        </bean>
+    </beans> -->
+    
+    <!-- <beans profile="dev">
+        <bean id="dataSource" parent="abstractDataSource">
+            <property name="url"
+                      value="jdbc:mysql://rds4544gvd3899g5ukdypublic.mysql.rds.aliyuncs.com:3306/linklife?useUnicode=true&amp;characterEncoding=utf-8"/>
+            <property name="username" value="unes"/>
+            <property name="password" value="8xW7wdWdhFe"/>
+        </bean>
+    </beans> -->
+    
+    <!-- <beans profile="dev">
+        <bean id="dataSource" parent="abstractDataSource">
+            <property name="url"
+                      value="jdbc:mysql://rdsqv472b2f2i81q2b11.mysql.rds.aliyuncs.com:3306/linklife?useUnicode=true&amp;characterEncoding=utf-8"/>
+            <property name="username" value="unes"/>
+            <property name="password" value="8xW7wdWdhFe"/>
+        </bean>
+    </beans> -->
+    
+    <!-- <beans profile="dev">
+        <bean id="dataSource" parent="abstractDataSource">
+            <property name="url"
+                      value="jdbc:mysql://rdsqv472b2f2i81q2b11.mysql.rds.aliyuncs.com:3306/linklife?useUnicode=true&amp;characterEncoding=utf-8"/>
+            <property name="username" value="unes"/>
+            <property name="password" value="Unes2015"/>
+        </bean>
+    </beans> -->
+    
+    <!-- 开发环境:生产环境外网地址 -->
+    <beans profile="dev">
+        <bean id="dataSource" parent="abstractDataSource">
+            <!-- <property name="url"
+                      value="jdbc:mysql://rdsh3zt3j690338a36lao.mysql.rds.aliyuncs.com:3306/linklife?useUnicode=true&amp;characterEncoding=utf-8"/> -->
+            <property name="url"
+                      value="jdbc:mysql://rdsqv472b2f2i81q2b11o.mysql.rds.aliyuncs.com:3306/miku_test?useUnicode=true&amp;characterEncoding=utf-8"/>
+            <property name="username" value="unes"/>
+            <property name="password" value="8xW7wdWdhFe"/>
+        </bean>
+    </beans>
+
+	<!-- 测试环境外网 -->
+    <beans profile="test">
+        <bean id="dataSource" parent="abstractDataSource">
+            <property name="url"
+                      value="jdbc:mysql://rdsqv472b2f2i81q2b11o.mysql.rds.aliyuncs.com:3306/miku_test?useUnicode=true&amp;characterEncoding=utf-8"/>
+            <property name="username" value="unes"/>
+            <property name="password" value="8xW7wdWdhFe"/>
+        </bean>
+    </beans>
+
+	<!-- 生产环境内网地址 -->
+    <beans profile="prod">
+        <bean id="dataSource" parent="abstractDataSource">
+            <property name="url"
+                      value="jdbc:mysql://rdsh3zt3j690338a36la.mysql.rds.aliyuncs.com:3306/linklife?useUnicode=true&amp;characterEncoding=utf-8"/>
+            <property name="username" value="unes"/>
+            <property name="password" value="Unes2015"/>
+        </bean>
+    </beans>
+    
+    <!-- 生产环境:生产数据库外网地址 -->
+    <!-- <beans profile="prod">
+        <bean id="dataSource" parent="abstractDataSource">
+            <property name="url"
+                      value="jdbc:mysql://rdsh3zt3j690338a36lao.mysql.rds.aliyuncs.com:3306/linklife?useUnicode=true&amp;characterEncoding=utf-8"/>
+            <property name="username" value="unes"/>
+            <property name="password" value="Unes2015"/>
+        </bean>
+    </beans> -->
+    
+    <!-- 生产环境：测试数据库外网地址 -->
+    <!-- <beans profile="prod">
+        <bean id="dataSource" parent="abstractDataSource">
+            <property name="url"
+                      value="jdbc:mysql://rdsqv472b2f2i81q2b11o.mysql.rds.aliyuncs.com:3306/miku_test?useUnicode=true&amp;characterEncoding=utf-8"/>
+            <property name="username" value="unes"/>
+            <property name="password" value="8xW7wdWdhFe"/>
+        </bean>
+    </beans> -->
+
+</beans>

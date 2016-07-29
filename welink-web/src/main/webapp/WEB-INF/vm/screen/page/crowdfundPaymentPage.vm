@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>众筹商品详情 支付页面</title>
+    #parse("head.vm")
+    <link rel="stylesheet" href="http://$!{host}/h5/css/page/crowdfundPaymentPage.css?v=$!{ver}"/>
+</head>
+<body>
+<div class="waitting" style="margin-left: -44px; margin-top: -40px;">
+    <div class="loading"></div>
+    <div class="message">正在加载...</div>
+</div>
+<script src="http://$!{host}/h5/js/lib/main.js?v=$!{ver}"></script>
+<script src="http://$!{host}/h5/js/page/crowdfundPaymentPage.js?v=$!{ver}"></script>
+    #parse("footer.vm")
+</body>
+</html>

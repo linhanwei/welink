@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.welink.commons.persistence.MikuUserOneBuyDOMapper" >
+
+	<select id="sumNumByParams" resultType="java.lang.Integer" parameterType="com.welink.commons.domain.MikuUserOneBuyDOExample" >
+	    <!--
+	    	统计用户一元购人次
+	    -->
+	    select sum(num)
+	    from miku_user_one_buy
+	    <if test="_parameter != null" >
+	      <include refid="Example_Where_Clause" />
+	    </if>
+	    GROUP BY item_id
+	</select>
+	
+	<select id="selectRewardUserOneBuy" resultMap="BaseResultMap" parameterType="com.welink.commons.domain.MikuUserOneBuyDO" >
+	    <!--
+	    	查询获奖用户一元购记录
+	    -->
+	    select 
+	    	<include refid="Base_Column_List" />
+	    from miku_user_one_buy
+	    <where>
+	    	item_Id = #{itemId,jdbcType=BIGINT} 
+	    	and periods = #{periods,jdbcType=INTEGER}
+	    	and status = #{status,jdbcType=TINYINT} 
+	    	and #{startCode,jdbcType=BIGINT} BETWEEN start_code and start_code+num
+	    </where>
+	</select>
+
+</mapper>

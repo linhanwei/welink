@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.welink.commons.persistence.MikuCsadDOMapper" >
+  <resultMap id="GroupCsadVOMap" type="com.welink.commons.vo.MikuCsadVO" >
+  	<!-- 专家分组列表  -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="csad_jobnumber" property="csadJobnumber" jdbcType="VARCHAR" />
+    <result column="csad_name" property="csadName" jdbcType="VARCHAR" />
+    <result column="csad_tel" property="csadTel" jdbcType="VARCHAR" />
+    <result column="csad_pic_url" property="csadPicUrl" jdbcType="VARCHAR" />
+    <result column="csad_notice_board" property="csadNoticeBoard" jdbcType="VARCHAR" />
+    <result column="csad_introduce" property="csadIntroduce" jdbcType="VARCHAR" />
+    <result column="csad_speciality" property="csadSpeciality" jdbcType="VARCHAR" />
+    <result column="csad_achievement" property="csadAchievement" jdbcType="VARCHAR" />
+    <result column="csad_level" property="csadLevel" jdbcType="INTEGER" />
+    <result column="csad_status" property="csadStatus" jdbcType="TINYINT" />
+    <result column="csad_available" property="csadAvailable" jdbcType="TINYINT" />
+    <result column="comment_count" property="commentCount" jdbcType="INTEGER" />
+    <result column="advice_count" property="adviceCount" jdbcType="INTEGER" />
+    <result column="version" property="version" jdbcType="BIGINT" />
+    <result column="date_created" property="dateCreated" jdbcType="TIMESTAMP" />
+    <result column="last_updated" property="lastUpdated" jdbcType="TIMESTAMP" />
+    
+    <result column="em_user_name" property="emUserName" jdbcType="VARCHAR" />
+    <result column="em_user_pw" property="emUserPw" jdbcType="VARCHAR" />
+    
+    <result column="csad_group_id" property="csadGroupId" jdbcType="BIGINT" />
+    <result column="csad_group_name" property="csadGroupName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="mineRecentlycontactLogVOMap" type="com.welink.commons.vo.MikuMineRecentlycontactLogVO" >
+    <!--
+      	聊天列表
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="csad_id" property="csadId" jdbcType="BIGINT" />
+    <result column="csad_user_id" property="csadUserId" jdbcType="BIGINT" />
+    <result column="csad_name" property="csadName" jdbcType="VARCHAR" />
+    <result column="evaluate_note" property="evaluateNote" jdbcType="VARCHAR" />
+    <result column="evaluate_level" property="evaluateLevel" jdbcType="TINYINT" />
+    <result column="version" property="version" jdbcType="BIGINT" />
+    <result column="date_created" property="dateCreated" jdbcType="TIMESTAMP" />
+    <result column="last_updated" property="lastUpdated" jdbcType="TIMESTAMP" />
+    <result column="emUserName" property="emUserName" jdbcType="VARCHAR" />
+    <result column="emUserPw" property="emUserPw" jdbcType="VARCHAR" />
+    <result column="emCsadName" property="emCsadName" jdbcType="VARCHAR" />
+    <result column="emCsadPw" property="emCsadPw" jdbcType="VARCHAR" />
+    <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
+    <result column="csad_pic_url" property="csadPicUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="mikuCsadEvaluateVOMap" type="com.welink.commons.vo.MikuCsadEvaluateVO" >
+    <!--
+      	专家评论列表
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="csad_id" property="csadId" jdbcType="BIGINT" />
+    <result column="csad_user_id" property="csadUserId" jdbcType="BIGINT" />
+    <result column="csad_name" property="csadName" jdbcType="VARCHAR" />
+    <result column="evaluate_note" property="evaluateNote" jdbcType="VARCHAR" />
+    <result column="evaluate_level" property="evaluateLevel" jdbcType="TINYINT" />
+    <result column="version" property="version" jdbcType="BIGINT" />
+    <result column="date_created" property="dateCreated" jdbcType="TIMESTAMP" />
+    <result column="last_updated" property="lastUpdated" jdbcType="TIMESTAMP" />
+    <result column="userNickName" property="userNickName" jdbcType="VARCHAR" />
+    <result column="emUserName" property="emUserName" jdbcType="VARCHAR" />
+    <result column="emUserPw" property="emUserPw" jdbcType="VARCHAR" />
+    <result column="emCsadName" property="emCsadName" jdbcType="VARCHAR" />
+    <result column="emCsadPw" property="emCsadPw" jdbcType="VARCHAR" />
+    <result column="user_pic_url" property="userPicUrl" jdbcType="VARCHAR" />
+    <result column="csad_pic_url" property="csadPicUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select resultMap="GroupCsadVOMap" parameterType="java.util.Map" id="getGroupCsadList" >
+    <!--
+     	专家分组列表
+    -->
+    select
+    	mc.id, mc.user_id, mc.csad_jobnumber, mc.csad_name, mc.csad_pic_url, mc.csad_notice_board, mc.csad_introduce, 
+    	mc.csad_speciality, mc.csad_level, mc.csad_achievement, mc.csad_available, mc.csad_status, mc.csad_tel,
+    	mc.comment_count, mc.advice_count,
+    	p.em_user_name, <!-- p.em_user_pw, -->
+    	cg.id as csad_group_id, cg.csad_group_name
+    from miku_csad mc
+		LEFT JOIN miku_csad_group_map cgm on mc.id = cgm.csad_id
+		LEFT JOIN miku_csad_group cg on cgm.csad_group_id = cg.id
+		LEFT JOIN profile p on mc.user_id = p.id
+	<where>
+		<if test="emUserName != null" >
+	    	and p.em_user_name = #{emUserName,jdbcType=VARCHAR}
+	    </if>
+	</where>
+  </select>
+  
+  <select resultMap="mineRecentlycontactLogVOMap" parameterType="java.util.Map" id="getMineRecentlycontactLogVOList" >
+    <!--
+      	聊天列表
+    -->
+    select 
+    	u.em_user_name emUserName, u.profile_pic user_pic_url, 
+    	csadu.em_user_name emCsadName, rl.csad_name, mc.csad_pic_url, 
+    	rl.id, rl.user_id, rl.csad_id, rl.csad_user_id, rl.evaluate_note, rl.evaluate_level, rl.version, 
+    	rl.date_created, rl.last_updated
+	from miku_mine_recentlycontact_log rl
+		LEFT JOIN `profile` u on rl.user_id = u.id
+		LEFT JOIN `profile` csadu on rl.csad_user_id = csadu.id
+		LEFT JOIN miku_csad mc on rl.csad_id = mc.id
+	<where>
+		<if test="userId != null and userId > 0" >
+			and rl.user_id = #{userId,jdbcType=BIGINT}
+	    </if>
+	    <if test="csadUserId != null and csadUserId > 0" >
+	    	and rl.csad_user_id = #{csadUserId,jdbcType=BIGINT}
+	    </if>
+	</where>
+	<if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      limit ${limit}
+    </if>
+    <if test="offset != null" >
+      offset ${offset}
+    </if>
+  </select>
+  
+  <select resultMap="mikuCsadEvaluateVOMap" parameterType="java.util.Map" id="getCsadEvaluateVOList" >
+    <!--
+      	专家评论列表
+    -->
+    select 
+    	u.em_user_name emUserName, u.nickname userNickName, u.profile_pic user_pic_url, 
+    	csadu.em_user_name emCsadName, rl.csad_name, mc.csad_pic_url, 
+    	rl.id, rl.user_id, rl.csad_id, rl.csad_user_id, rl.evaluate_note, rl.evaluate_level, rl.version, 
+    	rl.date_created, rl.last_updated
+	from miku_csad_evaluate rl
+		LEFT JOIN `profile` u on rl.user_id = u.id
+		LEFT JOIN `profile` csadu on rl.csad_user_id = csadu.id
+		LEFT JOIN miku_csad mc on rl.csad_id = mc.id
+	<where>
+		<if test="userId != null and userId > 0" >
+			and rl.user_id = #{userId,jdbcType=BIGINT}
+	    </if>
+	    <if test="csadUserId != null and csadUserId > 0" >
+	    	and rl.csad_user_id = #{csadUserId,jdbcType=BIGINT}
+	    </if>
+	    <if test="csadId != null and csadId > 0" >
+	    	and rl.csad_id = #{csadId,jdbcType=BIGINT}
+	    </if>
+	</where>
+	<if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      limit ${limit}
+    </if>
+    <if test="offset != null" >
+      offset ${offset}
+    </if>
+  </select>
+  
+  <select resultMap="GroupCsadVOMap" parameterType="java.util.Map" id="getPrivateExpertList" >
+    <!--
+      	私人专家列表
+    -->
+    select 
+    	mc.id, mc.user_id, mc.csad_jobnumber, mc.csad_name, mc.csad_pic_url, mc.csad_notice_board, mc.csad_introduce, 
+    	mc.csad_speciality, mc.csad_level, mc.csad_achievement, mc.csad_available, mc.csad_status, mc.csad_tel,
+    	mc.comment_count, mc.advice_count,
+    	p.em_user_name
+	from miku_csad_clients cc 
+		INNER JOIN miku_csad mc on cc.csad_id = mc.id
+		LEFT JOIN profile p on mc.user_id = p.id
+	<where>
+		<if test="clientUserId != null and clientUserId > 0" >
+			and cc.client_user_id  = #{clientUserId,jdbcType=BIGINT}
+	    </if>
+	</where>
+	<if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      limit ${limit}
+    </if>
+    <if test="offset != null" >
+      offset ${offset}
+    </if>
+  </select>
+  
+</mapper>

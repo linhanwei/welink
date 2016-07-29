@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>米酷</title>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="cleartype" content="on">
+    <meta name="viewport"
+          content="width=device-width, minimum-scale=1.0, maximum-scale=1.0,initial-scale=1, user-scalable=no">
+    <meta name="editor" content="superman">
+    <link rel="stylesheet" href="http://$!{host}/h5/css/common.css?v=$!{ver}">
+    <link rel="stylesheet" href="http://$!{host}/h5/css/page/login.css?v=$!{ver}">
+</head>
+<body>
+<script src="http://$!{host}/h5/js/lib/main.js?v=$!{ver}"></script>
+<script src="http://$!{host}/h5/js/page/login.js?v=$!{ver}"></script>
+</body>
+</html>

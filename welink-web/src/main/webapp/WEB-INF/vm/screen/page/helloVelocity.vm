@@ -1,0 +1,18 @@
+<body>
+<h2>文件上传实例</h2>
+
+<h2>-!host--${host}</h2>
+<h2>---host--$host</h2>
+
+<form action="hello2.htm" method="post" enctype="multipart/form-data">
+    选择文件:<input type="file" name="file">
+    <input type="submit" value="提交">
+</form>
+
+<form action="/api/h/1.0/uploadUserQrCode.json" method="post" enctype="multipart/form-data">
+    选择文件:<input type="file" name="file">
+    <input type="submit" value="提交2">
+</form>
+
+
+</body>

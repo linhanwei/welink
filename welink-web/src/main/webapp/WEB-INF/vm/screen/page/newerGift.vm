@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>米酷</title>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="cleartype" content="on">
+    <meta name="viewport"
+          content="width=device-width, minimum-scale=1.0, maximum-scale=1.0,initial-scale=1, user-scalable=no">
+    <meta name="editor" content="superman">
+    <link rel="stylesheet" href="http://$!{host}/h5/css/common.css?v=$!{ver}">
+    <link rel="stylesheet" href="http://$!{host}/h5/css/page/newuser.css?v=$!{ver}">
+    <script>
+        var pageConfig = {
+            openid: "$!{openid}",
+            shopid: "$!{shop_id}",
+            pid: "$!{profileId}"
+        }
+    </script>
+</head>
+<body>
+<div class="waitting" style="margin-left: -44px; margin-top: -40px;">
+    <div class="loading"></div>
+    <div class="message">正在加载...</div>
+</div>
+<script src="http://$!{host}/h5/js/lib/main.js?v=$!{ver}"></script>
+<script src="http://$!{host}/h5/js/page/newuser.js?v=$!{ver}"></script>
+</body>
+</html>

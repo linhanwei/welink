@@ -1,0 +1,429 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.welink</groupId>
+    <artifactId>welink</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>welink</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-version>4.1.5.RELEASE</spring-version>
+        <shiro-version>1.2.3</shiro-version>
+        <drools-version>6.1.0.Final</drools-version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>mvnrepository</id>
+            <url>http://central.maven.org/maven2/</url>
+        </repository>
+
+        <!--<repository>-->
+        <!--<id>mmp-mvn-repo</id>-->
+        <!--<url>https://raw.github.com/danileyang/mmp/mvn-repo/</url>-->
+        <!--</repository>-->
+    </repositories>
+    
+    <profiles>  
+		<profile>
+             <id>test</id>
+             <properties>  
+				<emchat.api.org>mikusdp</emchat.api.org>
+				<emchat.api.app>mikuandroid</emchat.api.app>
+				<emchat.api.client.id>YXA6GUWV8ALREeaGjRGe_9F7UA</emchat.api.client.id>
+				<emchat.api.client.secret>YXA6t1RJu0DXxsgFe4rkIw7mWpFeytQ</emchat.api.client.secret>
+             </properties>  
+             <activation>  
+                    <activeByDefault>true</activeByDefault>  
+             </activation>
+        </profile>  
+          
+        <profile>  
+             <id>prod</id>  
+             <properties>  
+				<emchat.api.org>mikusdp</emchat.api.org>
+				<emchat.api.app>mikuios</emchat.api.app>
+				<emchat.api.client.id>YXA67ZuUUPrhEeWWJ0fwfWDAYw</emchat.api.client.id>
+				<emchat.api.client.secret>YXA6MfqrELq77nFVK4FCN7to8bX_R_o</emchat.api.client.secret>
+             </properties>  
+        </profile>
+    </profiles>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring 3 dependencies -->
+            <!-- ================================================= -->
+            <!-- Spring框架 -->
+            <!-- ================================================= -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring-version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring-version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${spring-version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-orm</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-tx</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+
+            <!-- json -->
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>20140107</version>
+            </dependency>
+            <!-- shiro-web -->
+            <dependency>
+                <groupId>org.apache.shiro</groupId>
+                <artifactId>shiro-web</artifactId>
+                <version>${shiro-version}</version>
+            </dependency>
+            <!-- shiro-spring -->
+            <dependency>
+                <groupId>org.apache.shiro</groupId>
+                <artifactId>shiro-spring</artifactId>
+                <version>${shiro-version}</version>
+            </dependency>
+            <!-- shiro-ehcache -->
+            <dependency>
+                <groupId>org.apache.shiro</groupId>
+                <artifactId>shiro-ehcache</artifactId>
+                <version>${shiro-version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.3.5</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpcore</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.3.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>1.0.12</version>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.10</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- slf4j -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>1.7.7</version>
+            </dependency>
+
+            <!-- analysis -->
+            <dependency>
+                <groupId>com.brsanthu</groupId>
+                <artifactId>google-analytics-java</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.keen</groupId>
+                <artifactId>keen-client-api-java</artifactId>
+                <version>2.1.0</version>
+            </dependency>
+
+            <!-- 微信SDK -->
+            <!--<dependency>-->
+            <!--<groupId>me.chanjar</groupId>-->
+            <!--<artifactId>weixin-java-mp</artifactId>-->
+            <!--<version>1.1.1</version>-->
+            <!--</dependency>-->
+
+            <!-- 阿里云 ONS -->
+            <dependency>
+                <groupId>com.aliyun.openservices</groupId>
+                <artifactId>ons-client</artifactId>
+                <version>1.1.5</version>
+            </dependency>
+
+            <!-- <dependency>
+                <groupId>com.aliyun.opensearch</groupId>
+                <artifactId>aliyun-sdk-opensearch</artifactId>
+                <version>2.1.2</version>
+            </dependency> -->
+            
+            <dependency>
+                <groupId>com.aliyun.opensearch</groupId>
+                <artifactId>aliyun-sdk-opensearch</artifactId>
+                <version>2.1.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.spy</groupId>
+                <artifactId>spymemcached</artifactId>
+                <version>2.11.6</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.jcabi</groupId>
+                <artifactId>jcabi-aspects</artifactId>
+                <version>0.20.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aspects</artifactId>
+                <version>${spring-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjrt</artifactId>
+                <version>1.6.11</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>1.6.11</version>
+            </dependency>
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib</artifactId>
+                <version>2.1_3</version>
+            </dependency>
+            <!-- reactivex -->
+            <dependency>
+                <groupId>io.reactivex</groupId>
+                <artifactId>rxjava</artifactId>
+                <version>1.0.7</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.netflix.hystrix</groupId>
+                <artifactId>hystrix-core</artifactId>
+                <version>1.3.20</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.reactivex</groupId>
+                        <artifactId>rxjava</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+
+            <!-- drools -->
+            <dependency>
+                <groupId>org.drools</groupId>
+                <artifactId>drools-core</artifactId>
+                <version>${drools-version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.drools</groupId>
+                <artifactId>drools-compiler</artifactId>
+                <version>${drools-version}</version>
+            </dependency>
+
+            <!-- groovy -->
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>2.4.1</version>
+            </dependency>
+
+            <!-- spock -->
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-core</artifactId>
+                <version>0.7-groovy-2.0</version>
+                <scope>test</scope>
+            </dependency>
+            
+            <dependency>
+				<groupId>javax.ws.rs</groupId>
+				<artifactId>javax.ws.rs-api</artifactId>
+				<version>2.0.1</version>
+			</dependency>
+			
+			<dependency>
+	            <groupId>org.glassfish.jersey.core</groupId>
+	            <artifactId>jersey-client</artifactId>
+	            <version>2.22.2</version>
+	        </dependency>
+	        <dependency>
+	            <groupId>org.glassfish.jersey.media</groupId>
+	            <artifactId>jersey-media-json-jackson</artifactId>
+	            <version>2.22.2</version>
+	        </dependency>
+	        <dependency>
+	            <groupId>org.glassfish.jersey.media</groupId>
+	            <artifactId>jersey-media-multipart</artifactId>
+	            <version>2.22.2</version>
+	        </dependency>
+	        
+	        <!-- zxing二维码 -->
+	        <dependency>
+				<groupId>com.google.zxing</groupId>
+				<artifactId>core</artifactId>
+				<version>3.0.0</version>
+			</dependency>
+		    
+		    <dependency>
+				<groupId>com.google.zxing</groupId>
+				<artifactId>javase</artifactId>
+				<version>3.0.0</version>
+			</dependency>
+            
+
+        </dependencies>
+    </dependencyManagement>
+
+
+    <build>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <finalName>welink</finalName>
+                    <descriptors>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.2</version>
+                    <configuration>
+                        <source>1.7</source>
+                        <target>1.7</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        
+        <resources>   
+			<resource>   
+				<directory>src/main/resources</directory>  
+				<includes>
+					<include>**/*</include>
+				</includes> 
+				<filtering>true</filtering>  
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</resource>
+		</resources>
+        
+    </build>
+    <modules>
+        <module>welink-biz</module>
+        <module>welink-web</module>
+        <module>welink-buy</module>
+        <module>welink-commons</module>
+        <module>welink-promotion</module>
+        <module>welink-mp</module>
+    </modules>
+</project>

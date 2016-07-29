@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>订单详情</title>
+    #parse("head.vm")
+    <link rel="stylesheet" href="http://$!{host}/h5/css/page/orderDetail.css?v=$!{ver}"/>
+</head>
+<body>
+<script src="http://$!{host}/h5/js/lib/main.js?v=$!{ver}"></script>
+<script src="http://$!{host}/h5/js/page/orderDetail.js?v=$!{ver}"></script>
+    #parse("footer.vm")
+</body>
+</html>

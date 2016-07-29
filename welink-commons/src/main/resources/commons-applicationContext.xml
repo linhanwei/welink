@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="classpath:commons-mapper.xml"/>
+    <import resource="classpath:commons-dataSource.xml"/>
+
+    <bean id="eventTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="10"/>
+        <property name="maxPoolSize" value="10"/>
+        <property name="queueCapacity" value="50000"/>
+        <property name="threadNamePrefix" value="async-event-task-"/>
+    </bean>
+
+    <bean id="asyncEventBus" class="com.google.common.eventbus.AsyncEventBus">
+        <constructor-arg index="0" value="async-event-bus"/>
+        <constructor-arg index="1" ref="eventTaskExecutor"/>
+    </bean>
+
+</beans>

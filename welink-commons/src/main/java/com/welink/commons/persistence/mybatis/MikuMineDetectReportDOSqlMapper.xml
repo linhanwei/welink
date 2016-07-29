@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.welink.commons.persistence.MikuMineDetectReportDOMapper" >
+  <resultMap id="detectReportTradesMapVO" type="com.welink.commons.vo.DetectReportTradeVO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="reportDateCreated" property="reportDateCreated" jdbcType="TIMESTAMP" />
+    <result column="money" property="money" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="service_id" property="serviceId" jdbcType="BIGINT" />
+    
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_mobile" property="userMobile" jdbcType="VARCHAR" />
+    <result column="profile_pic" property="userPicUrl" jdbcType="VARCHAR" />
+    
+    <result column="csad_name" property="csadName" jdbcType="VARCHAR" />
+    <result column="csad_pic_url" property="csadPicUrl" jdbcType="VARCHAR" />
+    
+    <result column="trade_id" property="tradeId" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="tradeDateCreated" property="tradeDateCreated" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <select  id="getDetectReportTrades" resultMap="detectReportTradesMapVO" parameterType="java.util.Map">
+    select mdr.id, mdr.money, mdr.user_id, mdr.service_id, mdr.date_created reportDateCreated, 
+    	c.csad_name, c.csad_pic_url, 
+    	p.nickname user_name, p.mobile, p.profile_pic,
+		tr.trade_id, tr.status, tr.date_created tradeDateCreated
+	from miku_mine_detect_report mdr
+		LEFT JOIN trade tr on mdr.id = tr.detect_report_id
+		LEFT JOIN miku_csad c on mdr.service_id = c.user_id
+		LEFT JOIN profile p on mdr.user_id = p.id
+	<where>
+		<if test="userId != null and userId > 0" >
+			and mdr.user_id = #{userId,jdbcType=BIGINT}
+	    </if>
+	    <if test="serviceId != null and serviceId > 0" >
+			and mdr.service_id = #{serviceId,jdbcType=BIGINT}
+	    </if>
+	    <if test="hasTrade != null and hasTrade == 1" >
+	    	<!-- 是否有订单(0=全部；1=有订单) -->
+			and tr.trade_id is not null
+	    </if>
+	    
+	</where>
+	<if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      limit ${limit}
+    </if>
+    <if test="offset != null" >
+      offset ${offset}
+    </if>
+  </select>
+</mapper>
